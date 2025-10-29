@@ -4,7 +4,10 @@ from app import Base, User, Bin, Complaint, WasteSale
 from datetime import datetime, timedelta
 import os
 
-DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///waste_management.db')
+if 'postgresql' in os.environ.get('DATABASE_URL', ''):
+    DATABASE_URL = 'sqlite:///waste_management.db'
+else:
+    DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///waste_management.db')
 
 engine = create_engine(DATABASE_URL)
 

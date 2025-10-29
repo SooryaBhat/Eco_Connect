@@ -22,8 +22,12 @@ login_manager.login_view = 'login'
 
 Base = declarative_base()
 
-DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///waste_management.db')
-engine = create_engine(DATABASE_URL)
+if 'postgresql' in os.environ.get('DATABASE_URL', ''):
+    DATABASE_URL = 'sqlite:///waste_management.db'
+else:
+    DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///waste_management.db')
+
+engine = create_engine(DATABASE_URL, echo=False)
 Session = sessionmaker(bind=engine)
 db_session = Session()
 
@@ -40,7 +44,8 @@ class User(Base, UserMixin):
     created_at = Column(DateTime, default=datetime.utcnow)
     
     complaints = relationship('Complaint', backref='user', lazy=True)
-    waste_sales = relationship('WasteSale', backref='seller', lazy=True)
+    waste_sales = relationship('WasteSale', foreign_keys='WasteSale.seller_id', backref='seller', lazy=True)
+    purchases = relationship('WasteSale', foreign_keys='WasteSale.buyer_id', backref='buyer', lazy=True)
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -99,8 +104,6 @@ class WasteSale(Base):
     buyer_id = Column(Integer, ForeignKey('users.id'))
     status = Column(String(20), default='Available')
     created_at = Column(DateTime, default=datetime.utcnow)
-    
-    buyer = relationship('User', foreign_keys=[buyer_id], backref='purchases')
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -449,6 +452,8 @@ def government_transactions():
 @role_required('Government')
 def government_analytics():
     return render_template('government/analytics.html')
+
+Base.metadata.create_all(engine)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
