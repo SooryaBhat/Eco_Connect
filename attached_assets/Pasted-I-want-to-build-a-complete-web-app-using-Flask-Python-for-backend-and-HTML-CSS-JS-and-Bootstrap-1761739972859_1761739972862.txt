@@ -1,0 +1,99 @@
+I want to build a complete web app using Flask (Python) for backend and HTML, CSS, JS, and Bootstrap for frontend.
+The database should be MySQL, connected using SQLAlchemy.
+
+The app connects four roles: User, Collector, Recycler, and Government.
+I will host the backend on Render, and the database will be in MySQL Workbench, which I will connect via SQLAlchemy.
+
+Login Page
+
+Fields: Username, Role (dropdown), Password
+
+Below login, add text: “Don’t have an account? Sign up” (click → goes to signup page)
+
+Signup Page
+
+Fields: Username, Contact, Email, Role (dropdown), Location, Create Password, Confirm Password
+
+After signup, redirect to login page.
+
+Roles and Pages
+
+Each role has its own homepage after login with a top “Welcome, {name}” box and a right-side menu bar (three-line icon).
+The menu bar and bottom navigation buttons must match each role’s functions.
+
+User Role:
+
+Pages: Dashboard, Complaint, Sell
+
+Dashboard: “Scan the Bin” button → opens camera to scan saved bin QR → shows:
+
+Recyclable & Non-recyclable compartment weight
+
+% filled
+
+Last cleaned date
+
+Status (Urgent, Medium, Enough space)
+
+Complaint: user can submit complaints about bins.
+
+Sell: shows nearby recyclers in their location and “Sell your waste” form (image upload, waste type, etc.)
+
+On submit, waste is listed and visible to recyclers in that location.
+
+Collector Role:
+
+Pages: Dashboard, Sell, Complaint Received, Analytics
+
+Dashboard: shows all bins’ statuses in their assigned location (Urgent / Medium / Enough Space).
+
+Sell: same as user’s sell page.
+
+Complaint Received: lists all complaints from users.
+
+Analytics: later I will connect this to Power BI using the database; so make a placeholder “Analytics” page where charts/graphs can be embedded later.
+
+Recycler Role:
+
+Pages: Buy, Complaint, Sell
+
+Buy: shows all listed sell waste in their area.
+
+Sell: same form as others.
+
+Complaint: simple page to send or view complaints.
+(No analytics for recycler.)
+
+Government Role:
+
+Pages: Dashboard, Complaint Details, Buy & Sell Details, Analytics
+
+Dashboard: shows bin status in all assigned locations.
+
+Complaint Details: all complaints in that region.
+
+Buy & Sell Details: list of who sold to whom, etc.
+
+Analytics: placeholder page for Power BI integration later to view bin and waste analytics graphically.
+
+Design Requirements
+
+Use Bootstrap for layout and styling.
+
+Use images/icons for visual appeal (like bin icons, graph icons, etc.).
+
+Make it mobile responsive.
+
+Use separate files for:
+
+app.py (Flask backend)
+
+templates/ (HTML pages)
+
+static/css/ and static/js/ (for styles and scripts)
+
+Keep routes modular and clearly named for each role.
+
+Database tables: users, bins, complaints, waste_sales, etc.
+
+Connect to MySQL via SQLAlchemy (I’ll add my connection string manually).
