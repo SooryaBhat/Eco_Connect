@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Buy Waste{% endblock %}
+
+{% block menu_items %}
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('recycler_buy') }}">
+        <i class="fas fa-shopping-cart"></i> Buy
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('recycler_complaint') }}">
+        <i class="fas fa-exclamation-circle"></i> Complaints
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('recycler_sell') }}">
+        <i class="fas fa-recycle"></i> Sell
+    </a>
+</li>
+{% endblock %}
+
+{% block bottom_nav %}
+<a href="{{ url_for('recycler_buy') }}" class="text-success">
+    <i class="fas fa-shopping-cart fa-2x"></i>
+</a>
+<a href="{{ url_for('recycler_complaint') }}" class="text-secondary">
+    <i class="fas fa-exclamation-circle fa-2x"></i>
+</a>
+<a href="{{ url_for('recycler_sell') }}" class="text-secondary">
+    <i class="fas fa-recycle fa-2x"></i>
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body text-center">
+                    <h3><i class="fas fa-industry"></i> Welcome, {{ current_user.username }}!</h3>
+                    <p class="mb-0">Recycler - {{ current_user.location }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Available Waste in {{ current_user.location }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if waste_listings %}
+                    <div class="row">
+                        {% for waste in waste_listings %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                {% if waste.image_path %}
+                                <img src="{{ url_for('static', filename='../uploads/' + waste.image_path) }}" class="card-img-top" alt="{{ waste.waste_type }}" style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-recycle fa-4x text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ waste.waste_type }}</h5>
+                                    <p class="card-text">{{ waste.description if waste.description else 'No description' }}</p>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Quantity:</strong> {{ waste.quantity }} kg</li>
+                                        <li><strong>Price:</strong> ₹{{ waste.price if waste.price else 'Negotiable' }}</li>
+                                        <li><strong>Seller:</strong> {{ waste.seller.username }}</li>
+                                        <li><strong>Contact:</strong> {{ waste.seller.contact }}</li>
+                                    </ul>
+                                </div>
+                                <div class="card-footer">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock"></i> {{ waste.created_at.strftime('%Y-%m-%d') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                        <p class="text-muted">No waste available for purchase in your area.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
