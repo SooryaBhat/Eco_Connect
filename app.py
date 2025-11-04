@@ -22,18 +22,13 @@ login_manager.login_view = 'login'
 
 Base = declarative_base()
 
-if 'postgresql' in os.environ.get('DATABASE_URL', ''):
-    DATABASE_URL = 'sqlite:///waste_management.db'
-else:
-    DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///waste_management.db')
-
-engine = create_engine(DATABASE_URL, echo=False)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 db_session = Session()
-
 class User(Base, UserMixin):
     __tablename__ = 'users'
-    
+
     id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True, nullable=False)
     email = Column(String(120), unique=True, nullable=False)
@@ -42,16 +37,22 @@ class User(Base, UserMixin):
     role = Column(String(20), nullable=False)
     location = Column(String(100))
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     complaints = relationship('Complaint', backref='user', lazy=True)
-    waste_sales = relationship('WasteSale', foreign_keys='WasteSale.seller_id', backref='seller', lazy=True)
-    purchases = relationship('WasteSale', foreign_keys='WasteSale.buyer_id', backref='buyer', lazy=True)
-    
+
+    # 👇 seller relationship (uses seller_id)
+    waste_sales = relationship('WasteSale', back_populates='seller', foreign_keys='WasteSale.seller_id')
+
+    # 👇 buyer relationship (uses buyer_id)
+    purchases = relationship('WasteSale', back_populates='buyer', foreign_keys='WasteSale.buyer_id')
+
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
-    
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
 
 class Bin(Base):
     __tablename__ = 'bins'
@@ -89,21 +90,25 @@ class Complaint(Base):
     location = Column(String(100))
     status = Column(String(20), default='Pending')
     created_at = Column(DateTime, default=datetime.utcnow)
-
 class WasteSale(Base):
     __tablename__ = 'waste_sales'
-    
+
     id = Column(Integer, primary_key=True)
     seller_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    buyer_id = Column(Integer, ForeignKey('users.id'))
     waste_type = Column(String(100), nullable=False)
     quantity = Column(Float, nullable=False)
     description = Column(Text)
     image_path = Column(String(255))
     location = Column(String(100), nullable=False)
     price = Column(Float)
-    buyer_id = Column(Integer, ForeignKey('users.id'))
     status = Column(String(20), default='Available')
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    # 👇 Match back_populates exactly (no backref)
+    seller = relationship('User', foreign_keys=[seller_id], back_populates='waste_sales')
+    buyer = relationship('User', foreign_keys=[buyer_id], back_populates='purchases')
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -452,8 +457,6 @@ def government_transactions():
 @role_required('Government')
 def government_analytics():
     return render_template('government/analytics.html')
-
-Base.metadata.create_all(engine)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
