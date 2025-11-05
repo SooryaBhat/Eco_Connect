@@ -1,0 +1,28 @@
+/* ✅ Sidebar visibility fix */
+.offcanvas-body .nav-link {
+  color: #212529 !important; /* make menu items visible */
+}
+.offcanvas-body .nav-link i {
+  margin-right: 8px;
+}
+.offcanvas-body .nav-link.active {
+  background-color: rgba(25,135,84,0.15);
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* ✅ Keep sidebar readable and aligned */
+.offcanvas {
+  background-color: #ffffff !important;
+}
+
+/* ✅ Mobile bottom navbar look fix */
+.navbar.fixed-bottom i {
+  color: #198754;
+}
+
+/* Optional: improve card shadows */
+.card {
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
