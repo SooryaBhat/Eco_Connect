@@ -2,28 +2,6 @@
 
 {% block title %}Collector Dashboard{% endblock %}
 
-<li class="nav-item">
-    <a class="nav-link active" href="{{ url_for('collector_dashboard') }}">
-        <i class="fas fa-home"></i> Dashboard
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('collector_complaints') }}">
-        <i class="fas fa-comments"></i> Complaints
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('collector_sell') }}">
-        <i class="fas fa-recycle"></i> Sell
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('collector_analytics') }}">
-        <i class="fas fa-chart-bar"></i> Analytics
-    </a>
-</li>
-{% endblock %}
-
 {% block bottom_nav %}
 <a href="{{ url_for('collector_dashboard') }}" class="text-success">
     <i class="fas fa-home fa-2x"></i>
@@ -52,13 +30,14 @@
         </div>
     </div>
 
+    <!-- Bin Status Summary -->
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
             <div class="card text-white bg-danger">
                 <div class="card-body text-center">
                     <h5>Urgent</h5>
                     <h2>{{ bins|selectattr('status', 'equalto', 'Urgent')|list|length }}</h2>
-                    <p class="mb-0">Bins need immediate attention</p>
+                    <p class="mb-0">Bins needing immediate attention</p>
                 </div>
             </div>
         </div>
@@ -82,6 +61,7 @@
         </div>
     </div>
 
+    <!-- Bin Table -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
