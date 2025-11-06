@@ -99,13 +99,15 @@
       <div class="container-fluid">
         <a class="navbar-brand" href="#">Eco Connect</a>
         <div class="ms-auto d-flex align-items-center">
-          <button class="btn text-white me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+          <!-- ✅ This is the new menu button -->
+          <button id="menuButton" class="btn text-white me-3">
             <i class="fas fa-bars fs-4"></i>
           </button>
           <span class="navbar-text">Welcome, {{ current_user.username }}</span>
         </div>
       </div>
     </nav>
+
 
 
 <!-- Sidebar -->
@@ -195,5 +197,39 @@
 
 <!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% if current_user.is_authenticated and current_user.role == 'User' %}
+    <div class="bottom-nav">
+      <a href="{{ url_for('user_dashboard') }}">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="{{ url_for('user_complaint') }}">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>Complaints</span>
+      </a>
+      <a href="{{ url_for('user_sell') }}">
+        <i class="fas fa-recycle"></i>
+        <span>Sell</span>
+      </a>
+    </div>
+    {% endif %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const menuButton = document.querySelector("#menuButton");
+      const sidebar = document.querySelector("#sidebar");
+
+      menuButton.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+      });
+
+      // Hide sidebar if clicking outside (optional)
+      document.addEventListener("click", (e) => {
+        if (!sidebar.contains(e.target) && !menuButton.contains(e.target)) {
+          sidebar.classList.remove("show");
+        }
+      });
+    });
+    </script>
+
 </body>
 </html>

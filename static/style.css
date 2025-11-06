@@ -15,46 +15,58 @@ body {
 }
 
 /* Sidebar base */
+/* ------------------------
+   SIDEBAR (HIDDEN BY DEFAULT)
+------------------------ */
 #sidebar {
   background-color: #198754;
   color: white;
+  width: 250px;
+  position: fixed;
+  top: 56px; /* below navbar */
+  left: -250px; /* hidden initially */
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+  transition: left 0.3s ease;
+  z-index: 1040;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
+
+#sidebar.show {
+  left: 0; /* visible when toggled */
+}
+
 #sidebar .nav-link {
   color: white !important;
+  padding: 10px 15px;
+  display: block;
 }
+
 #sidebar .nav-link.active {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 8px;
 }
+
 #sidebar .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Sidebar hidden by default (even on desktop) */
+/* ------------------------
+   DESKTOP VIEW (keeps full width content)
+------------------------ */
 @media (min-width: 992px) {
-  #sidebar {
-    position: fixed !important;
-    top: 56px;
-    left: 0;
-    width: 250px;
-    height: calc(100vh - 56px);
-    background-color: #198754;
-    color: white;
-    overflow-y: auto;
-    display: none; /* hide by default */
-  }
-  .offcanvas.show {
-    display: block !important; /* show only when toggled */
-  }
   .container-fluid {
-    margin-left: 0 !important; /* keep content full width */
+    margin-left: 0 !important;
   }
 }
 
-/* Bottom navigation (for mobile view) */
+/* ------------------------
+   BOTTOM NAVIGATION (MOBILE VIEW)
+------------------------ */
 .bottom-nav {
   display: none;
 }
+
 @media (max-width: 991px) {
   .bottom-nav {
     display: flex;
@@ -73,15 +85,17 @@ body {
     color: #198754;
     text-align: center;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
+    flex-grow: 1;
   }
   .bottom-nav i {
     display: block;
     font-size: 20px;
+    margin-bottom: 2px;
   }
 }
 
-/* Add some spacing so content isn't hidden by bottom bar */
+/* Prevent bottom bar from covering content */
 .container-fluid {
-  margin-bottom: 70px; /* makes space for bottom nav */
+  margin-bottom: 70px;
 }
