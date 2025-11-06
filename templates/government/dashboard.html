@@ -1,43 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Government Dashboard{% endblock %}
-{% block menu_items %}
-<li class="nav-item">
-    <a class="nav-link active" href="{{ url_for('government_dashboard') }}">
-        <i class="fas fa-home"></i> Dashboard
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('government_complaints') }}">
-        <i class="fas fa-file-alt"></i> Complaint Details
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('government_transactions') }}">
-        <i class="fas fa-exchange-alt"></i> Buy & Sell Details
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('government_analytics') }}">
-        <i class="fas fa-chart-bar"></i> Analytics
-    </a>
-</li>
-{% endblock %}
 
-{% block bottom_nav %}
-<a href="{{ url_for('government_dashboard') }}" class="text-success">
-    <i class="fas fa-home fa-2x"></i>
-</a>
-<a href="{{ url_for('government_complaints') }}" class="text-secondary">
-    <i class="fas fa-file-alt fa-2x"></i>
-</a>
-<a href="{{ url_for('government_transactions') }}" class="text-secondary">
-    <i class="fas fa-exchange-alt fa-2x"></i>
-</a>
-<a href="{{ url_for('government_analytics') }}" class="text-secondary">
-    <i class="fas fa-chart-bar fa-2x"></i>
-</a>
-{% endblock %}
 
 {% block content %}
 <div class="container my-4">

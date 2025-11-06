@@ -1,28 +1,87 @@
-/* ✅ Sidebar visibility fix */
-.offcanvas-body .nav-link {
-  color: #212529 !important; /* make menu items visible */
-}
-.offcanvas-body .nav-link i {
-  margin-right: 8px;
-}
-.offcanvas-body .nav-link.active {
-  background-color: rgba(25,135,84,0.15);
-  border-radius: 6px;
-  font-weight: bold;
+/* ------------------------
+   GLOBAL STYLING
+------------------------ */
+body {
+  background-color: #f7f9fb;
+  overflow-x: hidden;
 }
 
-/* ✅ Keep sidebar readable and aligned */
-.offcanvas {
-  background-color: #ffffff !important;
+/* Navbar (top) */
+.navbar {
+  background-color: #0b6b53 !important;
+}
+.navbar-brand, .navbar-text {
+  color: white !important;
 }
 
-/* ✅ Mobile bottom navbar look fix */
-.navbar.fixed-bottom i {
-  color: #198754;
+/* Sidebar base */
+#sidebar {
+  background-color: #198754;
+  color: white;
+}
+#sidebar .nav-link {
+  color: white !important;
+}
+#sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+#sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Optional: improve card shadows */
-.card {
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+/* Sidebar hidden by default (even on desktop) */
+@media (min-width: 992px) {
+  #sidebar {
+    position: fixed !important;
+    top: 56px;
+    left: 0;
+    width: 250px;
+    height: calc(100vh - 56px);
+    background-color: #198754;
+    color: white;
+    overflow-y: auto;
+    display: none; /* hide by default */
+  }
+  .offcanvas.show {
+    display: block !important; /* show only when toggled */
+  }
+  .container-fluid {
+    margin-left: 0 !important; /* keep content full width */
+  }
+}
+
+/* Bottom navigation (for mobile view) */
+.bottom-nav {
+  display: none;
+}
+@media (max-width: 991px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    z-index: 1000;
+  }
+  .bottom-nav a {
+    color: #198754;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .bottom-nav i {
+    display: block;
+    font-size: 20px;
+  }
+}
+
+/* Add some spacing so content isn't hidden by bottom bar */
+.container-fluid {
+  margin-bottom: 70px; /* makes space for bottom nav */
 }

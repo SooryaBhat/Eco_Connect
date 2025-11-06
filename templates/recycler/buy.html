@@ -1,35 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Buy Waste{% endblock %}
-{% block menu_items %}
-<li class="nav-item">
-    <a class="nav-link active" href="{{ url_for('recycler_buy') }}">
-        <i class="fas fa-shopping-cart"></i> Buy
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('recycler_complaint') }}">
-        <i class="fas fa-exclamation-circle"></i> Complaints
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('recycler_sell') }}">
-        <i class="fas fa-recycle"></i> Sell
-    </a>
-</li>
-{% endblock %}
 
-{% block bottom_nav %}
-<a href="{{ url_for('recycler_buy') }}" class="text-success">
-    <i class="fas fa-shopping-cart fa-2x"></i>
-</a>
-<a href="{{ url_for('recycler_complaint') }}" class="text-secondary">
-    <i class="fas fa-exclamation-circle fa-2x"></i>
-</a>
-<a href="{{ url_for('recycler_sell') }}" class="text-secondary">
-    <i class="fas fa-recycle fa-2x"></i>
-</a>
-{% endblock %}
 
 {% block content %}
 <div class="container my-4">

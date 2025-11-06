@@ -1,35 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Sell Waste{% endblock %}
-{% block menu_items %}
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('user_dashboard') }}">
-        <i class="fas fa-home"></i> Dashboard
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ url_for('user_complaint') }}">
-        <i class="fas fa-exclamation-circle"></i> Complaints
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link active" href="{{ url_for('user_sell') }}">
-        <i class="fas fa-recycle"></i> Sell Waste
-    </a>
-</li>
-{% endblock %}
 
-{% block bottom_nav %}
-<a href="{{ url_for('user_dashboard') }}" class="text-secondary">
-    <i class="fas fa-home fa-2x"></i>
-</a>
-<a href="{{ url_for('user_complaint') }}" class="text-secondary">
-    <i class="fas fa-exclamation-circle fa-2x"></i>
-</a>
-<a href="{{ url_for('user_sell') }}" class="text-success">
-    <i class="fas fa-recycle fa-2x"></i>
-</a>
-{% endblock %}
 
 {% block content %}
 <div class="container my-4">
