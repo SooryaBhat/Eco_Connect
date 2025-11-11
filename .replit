@@ -9,7 +9,7 @@ packages = ["freetype", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp
 [userenv]
 
 [userenv.shared]
-DATABASE_URL = "mysql+pymysql://sql12805349:yANqBeU3Ts@sql12.freesqldatabase.com/sql12805349?charset=utf8mb4"
+DATABASE_URL = "mysql+pymysql://uhorxcjbhnlbu3k8:R2ryMxhjdpvYrCPEvR6s@b1euh9kivg17367rolt1-mysql.services.clever-cloud.com/b1euh9kivg17367rolt1?charset=utf8mb4"
 
 [[ports]]
 localPort = 5000
