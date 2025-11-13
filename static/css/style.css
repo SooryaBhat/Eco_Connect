@@ -31,28 +31,37 @@ body {
   background-color: var(--accent);
   color: #fff;
 }
-/* Desktop: do NOT force sidebar open */
+/* Desktop fix: sidebar closed by default and opens when clicking hamburger */
 @media (min-width: 992px) {
+    #sidebar.offcanvas-start {
+        position: fixed;
+        top: var(--navbar-height);
+        left: -250px; /* hidden */
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--navbar-height));
+        background-color: var(--accent);
+        transition: left 0.3s ease;
+        z-index: 1040;
+    }
 
-  /* Sidebar hidden by default */
-  #sidebar.offcanvas-start {
-    left: -250px !important;
-    visibility: hidden !important;
-    transform: translateX(-100%) !important;
-  }
+    /* When sidebar is opened */
+    #sidebar.show {
+        left: 0 !important;
+        visibility: visible !important;
+        transform: none !important;
+    }
 
-  /* Full-width content (no pushing) */
-  .content-container {
-    margin-left: 0 !important;
-    padding-top: 12px;
-    padding-bottom: 40px;
-  }
+    /* Main content full width */
+    .content-container {
+        margin-left: 0 !important;
+    }
 
-  /* Keep menu button visible on desktop */
-  #menuButton {
-    display: block !important;
-  }
+    /* Keep close button visible only in mobile */
+    .offcanvas .btn-close {
+        display: none !important;
+    }
 }
+
 
 
 /* Offcanvas nav links styling */
