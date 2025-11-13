@@ -1,101 +1,121 @@
 /* ------------------------
    GLOBAL STYLING
 ------------------------ */
+:root{
+  --sidebar-width: 250px;
+  --navbar-height: 56px;
+  --accent: #198754;
+  --accent-dark: #0b6b53;
+}
+
+/* base */
+*{box-sizing:border-box}
 body {
   background-color: #f7f9fb;
-  overflow-x: hidden;
+  margin: 0;
+  padding-top: var(--navbar-height); /* ensures content starts below fixed navbar */
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* Navbar (top) */
+/* Navbar */
 .navbar {
-  background-color: #0b6b53 !important;
+  background-color: var(--accent-dark) !important;
+  height: var(--navbar-height);
 }
-.navbar-brand, .navbar-text {
-  color: white !important;
-}
+.navbar-brand, .navbar-text { color: #fff !important; }
 
-/* Sidebar base */
-/* ------------------------
-   SIDEBAR (HIDDEN BY DEFAULT)
------------------------- */
+/* Offcanvas / Sidebar (mobile uses bootstrap offcanvas; desktop we show it fixed) */
 #sidebar {
-  background-color: #198754;
-  color: white;
-  width: 250px;
-  position: fixed;
-  top: 56px; /* below navbar */
-  left: -250px; /* hidden initially */
-  height: calc(100vh - 56px);
-  overflow-y: auto;
-  transition: left 0.3s ease;
-  z-index: 1040;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  width: var(--sidebar-width);
+  background-color: var(--accent);
+  color: #fff;
 }
 
-#sidebar.show {
-  left: 0; /* visible when toggled */
+/* Make offcanvas look like a sidebar on desktop */
+@media (min-width: 992px) {
+  .offcanvas-start {
+    visibility: visible !important;
+    transform: none !important;
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    height: calc(100vh - var(--navbar-height));
+    width: var(--sidebar-width);
+    border-right: 1px solid rgba(255,255,255,0.12);
+    padding: 0;
+    overflow-y: auto;
+    z-index: 1030;
+  }
+
+  /* push content to the right so it doesn't sit under the sidebar */
+  .content-container {
+    margin-left: calc(var(--sidebar-width) + 16px);
+    padding-top: 12px;
+    padding-bottom: 80px; /* avoid bottom nav overlap if any */
+  }
+
+  /* hide the offcanvas close button on desktop */
+  .offcanvas .btn-close { display: none; }
 }
 
+/* Offcanvas nav links styling */
 #sidebar .nav-link {
-  color: white !important;
-  padding: 10px 15px;
+  color: #fff !important;
+  padding: 12px 18px;
   display: block;
+  transition: background-color .15s ease;
 }
+#sidebar .nav-link:hover { background-color: rgba(255,255,255,0.08); }
+#sidebar .nav-link.active { background-color: rgba(255,255,255,0.14); border-radius: 6px; }
 
-#sidebar .nav-link.active {
-  background-color: rgba(255, 255, 255, 0.2);
+/* Cards and welcome header spacing */
+.card.bg-success {
   border-radius: 8px;
 }
-
-#sidebar .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+.main-content .container-fluid {
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
-/* ------------------------
-   DESKTOP VIEW (keeps full width content)
------------------------- */
-@media (min-width: 992px) {
-  .container-fluid {
-    margin-left: 0 !important;
-  }
-}
+/* Progress bar text contrast */
+.progress-bar { font-weight: 600; color: #fff; }
 
-/* ------------------------
-   BOTTOM NAVIGATION (MOBILE VIEW)
------------------------- */
+/* Bottom nav (mobile) */
 .bottom-nav {
-  display: none;
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-top: 1px solid #eee;
+  justify-content: space-around;
+  align-items: center;
+  padding: 6px 0;
+  z-index: 1050;
+  height: 60px;
 }
+.bottom-nav a { color: var(--accent); text-decoration: none; font-size: 12px; display:block; }
+.bottom-nav i { font-size: 18px; display:block; margin-bottom: 2px; }
 
+/* Ensure table and card content are responsive */
+.table-responsive { overflow-x: auto; }
+
+/* small tweaks for the "welcome" card so it doesn't feel cramped on mobile */
 @media (max-width: 991px) {
-  .bottom-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #fff;
-    border-top: 1px solid #ccc;
-    justify-content: space-around;
-    align-items: center;
-    padding: 8px 0;
-    z-index: 1000;
-  }
-  .bottom-nav a {
-    color: #198754;
-    text-align: center;
-    text-decoration: none;
-    font-size: 13px;
-    flex-grow: 1;
-  }
-  .bottom-nav i {
-    display: block;
-    font-size: 20px;
-    margin-bottom: 2px;
-  }
+  .card.bg-success.text-white.mb-4 { margin-top: 6px; }
+  .content-container { padding-bottom: 84px; } /* allow space for bottom nav */
 }
 
-/* Prevent bottom bar from covering content */
-.container-fluid {
-  margin-bottom: 70px;
+/* Utility: make sure any in-page top content has breathing room below navbar */
+.page-top-space { margin-top: 8px; margin-bottom: 12px; }
+
+/* Minor cosmetic touches */
+.placeholder-analytics { min-height: 260px; display:flex; align-items:center; justify-content:center; color:#888; border-radius:8px; }
+
+/* small screens tweak: larger progress bar height */
+@media (max-width: 576px) {
+  .progress { height: 18px; }
+  .progress-bar { font-size: 0.9rem; }
 }

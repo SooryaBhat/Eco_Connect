@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from app import Base, User, Bin, Complaint, WasteSale
 from datetime import datetime, timedelta
 import os
+mysql+pymysql://uhorxcjbhnlbu3k8:R2ryMxhjdpvYrCPEvR6s@b1euh9kivg17367rolt1-mysql.services.clever-cloud.com/b1euh9kivg17367rolt1?charset=utf8mb4
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 engine = create_engine(DATABASE_URL)
