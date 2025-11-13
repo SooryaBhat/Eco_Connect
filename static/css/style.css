@@ -31,33 +31,29 @@ body {
   background-color: var(--accent);
   color: #fff;
 }
-
-/* Make offcanvas look like a sidebar on desktop */
+/* Desktop: do NOT force sidebar open */
 @media (min-width: 992px) {
-  .offcanvas-start {
-    visibility: visible !important;
-    transform: none !important;
-    position: fixed;
-    top: var(--navbar-height);
-    left: 0;
-    height: calc(100vh - var(--navbar-height));
-    width: var(--sidebar-width);
-    border-right: 1px solid rgba(255,255,255,0.12);
-    padding: 0;
-    overflow-y: auto;
-    z-index: 1030;
+
+  /* Sidebar hidden by default */
+  #sidebar.offcanvas-start {
+    left: -250px !important;
+    visibility: hidden !important;
+    transform: translateX(-100%) !important;
   }
 
-  /* push content to the right so it doesn't sit under the sidebar */
+  /* Full-width content (no pushing) */
   .content-container {
-    margin-left: calc(var(--sidebar-width) + 16px);
+    margin-left: 0 !important;
     padding-top: 12px;
-    padding-bottom: 80px; /* avoid bottom nav overlap if any */
+    padding-bottom: 40px;
   }
 
-  /* hide the offcanvas close button on desktop */
-  .offcanvas .btn-close { display: none; }
+  /* Keep menu button visible on desktop */
+  #menuButton {
+    display: block !important;
+  }
 }
+
 
 /* Offcanvas nav links styling */
 #sidebar .nav-link {
