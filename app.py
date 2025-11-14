@@ -503,6 +503,18 @@ def government_transactions():
 def government_analytics():
     return render_template('government/analytics.html')
 
+@app.route('/api/bin-stats')
+def bin_stats():
+    urgent = Bin.query.filter_by(status="Urgent").count()
+    medium = Bin.query.filter_by(status="Medium").count()
+    good = Bin.query.filter_by(status="Enough Space").count()
+
+    return jsonify({
+        "urgent": urgent,
+        "medium": medium,
+        "good": good
+    })
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)

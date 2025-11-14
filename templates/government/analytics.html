@@ -1,60 +1,36 @@
 {% extends "base.html" %}
-
 {% block title %}Analytics{% endblock %}
-
 
 {% block content %}
 <div class="container my-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card bg-primary text-white mb-4">
-                <div class="card-body text-center">
-                    <h3><i class="fas fa-landmark"></i> Welcome, {{ current_user.username }}!</h3>
-                </div>
-            </div>
+    <h3 class="mb-4 text-success">Analytics Dashboard</h3>
+
+    <!-- BAR CHART -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Bin Status Summary</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="statusChart" height="100"></canvas>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Regional Analytics Dashboard</h5>
-                </div>
-                <div class="card-body">
-                    <div class="text-center py-5">
-                        <i class="fas fa-chart-pie fa-5x text-muted mb-4"></i>
-                        <h4>Power BI Integration Coming Soon</h4>
-                        <p class="text-muted">This section will display comprehensive regional analytics and visualizations powered by Power BI.</p>
-                        <p class="text-muted">You'll be able to view:</p>
-                        <div class="row mt-4">
-                            <div class="col-md-6">
-                                <ul class="list-unstyled text-start">
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Bin status trends across regions</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Waste collection efficiency metrics</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Recyclable vs non-recyclable ratios</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Complaint resolution statistics</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <ul class="list-unstyled text-start">
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Regional comparison charts</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Waste transaction volume analysis</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Predictive bin fill forecasting</li>
-                                    <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Environmental impact metrics</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="mt-5">
-                            <div class="placeholder-analytics bg-light p-5 rounded">
-                                <p class="text-muted mb-0 h5">Power BI Dashboard Embed Area</p>
-                                <p class="text-muted mt-2">Connect your database to Power BI and embed the dashboard iframe here</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- PIE CHART -->
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Status Distribution</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="pieChart" height="120"></canvas>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Your custom JS -->
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
 {% endblock %}
