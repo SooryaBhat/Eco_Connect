@@ -503,30 +503,30 @@ def government_transactions():
 def government_analytics():
     return render_template('government/analytics.html')
 
-
 @app.route('/api/bin-stats')
 def bin_stats():
     urgent = Bin.query.filter_by(status="Urgent").count()
     medium = Bin.query.filter_by(status="Medium").count()
     good = Bin.query.filter_by(status="Enough Space").count()
 
-    return jsonify({"urgent": urgent, "medium": medium, "good": good})
-
-
-@app.route('/update_bin', methods=['POST'])
-def update_bin():
+    return jsonify({
+        "urgent": urgent,
+        "medium": medium,
+        "good": good
+    })
+    
+@app.route('/update_weight', methods=['POST'])
+def update_weight():
     data = request.json
     bin_code = data.get("bin_code")
-    distance = data.get("distance")
-    fill_percentage = data.get("fill_percentage")
-    status = data.get("status")
+    weight = data.get("weight")
 
     bin_data = db_session.query(Bin).filter_by(bin_code=bin_code).first()
+
     if bin_data:
-        bin_data.status = status
-        bin_data.recyclable_weight = 0  # optional
-        bin_data.non_recyclable_weight = 0
-        bin_data.capacity = fill_percentage
+        # Store weight in recyclable compartment for now
+        bin_data.recyclable_weight = weight
+        bin_data.update_status()
         db_session.commit()
         return jsonify({"success": True})
 
