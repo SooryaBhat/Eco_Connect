@@ -517,20 +517,32 @@ def bin_stats():
     
 @app.route('/update_weight', methods=['POST'])
 def update_weight():
-    data = request.json
-    bin_code = data.get("bin_code")
-    weight = data.get("weight")
+    data = request.get_json()
 
-    bin_data = db_session.query(Bin).filter_by(bin_code=bin_code).first()
+    bin_code = data.get('bin_code')
+    recyclable_weight = data.get('recyclable_weight')
 
-    if bin_data:
-        # Store weight in recyclable compartment for now
-        bin_data.recyclable_weight = weight
-        bin_data.update_status()
-        db_session.commit()
-        return jsonify({"success": True})
+    if not bin_code or recyclable_weight is None:
+        return jsonify({"success": False, "message": "Invalid data"}), 400
 
-    return jsonify({"success": False, "error": "Bin not found"})
+    # Find the bin
+    bin_obj = db_session.query(Bin).filter_by(bin_code=bin_code).first()
+
+    if not bin_obj:
+        return jsonify({"success": False, "message": "Bin not found"}), 404
+
+    # Update weight into database
+    bin_obj.recyclable_weight = float(recyclable_weight)
+
+    # Auto-update status
+    bin_obj.update_status()
+
+    db_session.commit()
+
+    return jsonify({"success": True, "message": "Weight updated!", 
+                    "recyclable_weight": bin_obj.recyclable_weight,
+                    "status": bin_obj.status})
+
 
 
 if __name__ == '__main__':
