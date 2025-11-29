@@ -542,7 +542,24 @@ def update_weight():
     return jsonify({"success": True, "message": "Weight updated!", 
                     "recyclable_weight": bin_obj.recyclable_weight,
                     "status": bin_obj.status})
+@app.route('/get_bin_weight/<bin_code>', methods=['GET'])
+def get_bin_weight(bin_code):
+    try:
+        bin_obj = db_session.query(Bin).filter_by(bin_code=bin_code).first()
 
+        if not bin_obj:
+            return jsonify({"success": False, "message": "Bin not found"}), 404
+
+        return jsonify({
+            "success": True,
+            "bin_code": bin_obj.bin_code,
+            "recyclable_weight": bin_obj.recyclable_weight,
+            "status": bin_obj.status,
+            "capacity": bin_obj.capacity  # If you have this
+        }), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 if __name__ == '__main__':
