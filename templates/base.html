@@ -28,7 +28,7 @@
     </div>
   </nav>
 
-  <!-- SIDEBAR (Bootstrap offcanvas used for mobile; on desktop we'll force visible) -->
+  <!-- SIDEBAR -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
     <div class="offcanvas-header bg-success text-white">
       <h5 class="offcanvas-title" id="sidebarLabel">Menu</h5>
@@ -37,19 +37,23 @@
 
     <div class="offcanvas-body p-0">
       <nav class="nav flex-column p-3">
+
         {% if current_user.role == 'User' %}
           <a class="nav-link" href="{{ url_for('user_dashboard') }}"><i class="fas fa-home me-2"></i>Dashboard</a>
           <a class="nav-link" href="{{ url_for('user_complaint') }}"><i class="fas fa-exclamation-circle me-2"></i>Complaints</a>
           <a class="nav-link" href="{{ url_for('user_sell') }}"><i class="fas fa-recycle me-2"></i>Sell Waste</a>
+
         {% elif current_user.role == 'Collector' %}
           <a class="nav-link" href="{{ url_for('collector_dashboard') }}"><i class="fas fa-home me-2"></i>Dashboard</a>
           <a class="nav-link" href="{{ url_for('collector_complaints') }}"><i class="fas fa-comments me-2"></i>Complaints</a>
           <a class="nav-link" href="{{ url_for('collector_sell') }}"><i class="fas fa-recycle me-2"></i>Sell Waste</a>
           <a class="nav-link" href="{{ url_for('collector_analytics') }}"><i class="fas fa-chart-bar me-2"></i>Analytics</a>
+
         {% elif current_user.role == 'Recycler' %}
           <a class="nav-link" href="{{ url_for('recycler_dashboard') }}"><i class="fas fa-home me-2"></i>Dashboard</a>
           <a class="nav-link" href="{{ url_for('recycler_buy') }}"><i class="fas fa-shopping-cart me-2"></i>Buy Waste</a>
           <a class="nav-link" href="{{ url_for('recycler_complaint') }}"><i class="fas fa-exclamation-circle me-2"></i>Complaints</a>
+
         {% elif current_user.role == 'Government' %}
           <a class="nav-link" href="{{ url_for('government_dashboard') }}"><i class="fas fa-home me-2"></i>Dashboard</a>
           <a class="nav-link" href="{{ url_for('government_complaints') }}"><i class="fas fa-file-alt me-2"></i>Complaints</a>
@@ -57,8 +61,23 @@
           <a class="nav-link" href="{{ url_for('government_analytics') }}"><i class="fas fa-chart-bar me-2"></i>Analytics</a>
         {% endif %}
 
+        <!-- 🌐 LANGUAGE MENU START -->
+        <hr class="my-2">
+        <div class="dropdown px-3">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            <i class="fas fa-language me-2"></i>Language
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/set_language/en">English</a></li>
+            <li><a class="dropdown-item" href="/set_language/kn">ಕನ್ನಡ</a></li>
+            <li><a class="dropdown-item" href="/set_language/tulu">ತುಳು</a></li>
+          </ul>
+        </div>
+        <!-- 🌐 LANGUAGE MENU END -->
+
         <hr class="my-2">
         <a class="nav-link text-danger" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+
       </nav>
     </div>
   </div>
@@ -102,7 +121,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const offcanvasEl = document.getElementById('sidebar');
-      // Create a bootstrap Offcanvas so toggle works on mobile
       let bsOffcanvas = null;
       if (offcanvasEl) {
         bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
@@ -114,8 +132,6 @@
           bsOffcanvas.toggle();
         });
       }
-
-      // on large screens ensure sidebar is visible (CSS handles this)
     });
   </script>
 

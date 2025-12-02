@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 import os
 from functools import wraps
+from flask_babel import Babel, gettext as _
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET',
@@ -560,7 +561,17 @@ def get_bin_weight(bin_code):
 
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+@babel.localeselector
+def get_locale():
+    return session.get('lang', 'en')
 
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    supported = ['en', 'kn', 'tulu']
+    if lang in supported:
+        session['lang'] = lang
+    return redirect(request.referrer or url_for('index'))
+    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
