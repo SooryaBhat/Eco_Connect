@@ -564,9 +564,10 @@ def get_bin_weight(bin_code):
 
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
-@babel.localeselector
+@babel.locale_selector_func
 def get_locale():
     return session.get('lang', 'en')
+
 
 @app.route('/set_language/<lang>')
 def set_language(lang):
