@@ -5,12 +5,13 @@ description = "Eco Connect Web App"
 requires-python = ">=3.11"
 
 dependencies = [
-    "flask>=3.1.2",
+    "flask>=2.3.3",
     "flask-login>=0.6.3",
     "pillow>=10.0.0",
     "sqlalchemy>=2.0.44",
     "werkzeug>=3.1.3",
     "pymysql>=1.1.0",
-    "gunicorn>=23.0.0"
-    "Flask-Babel-Next==1.2.0"
+    "gunicorn>=23.0.0",
+    "Fla=sk-Babel=3.1.0"
+
 ]

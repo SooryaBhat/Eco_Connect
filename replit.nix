@@ -12,7 +12,6 @@
     pkgs.python311Packages.pymysql
     pkgs.python311Packages.gunicorn
     pkgs.python311Packages.flask-babel
-
   ];
 }
 
