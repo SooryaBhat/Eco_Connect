@@ -10,12 +10,16 @@ import os
 from functools import wraps
 from flask_babel import Babel, gettext as _
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET',
                                           'your-secret-key-change-this')
 babel = Babel(app)
+
 app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'kn', 'tulu']
+app.config['BABEL_DEFAULT_TIMEZONE'] = 'UTC'
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
@@ -564,9 +568,10 @@ def get_bin_weight(bin_code):
 
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
-@babel.locale_selector_func
+@babel.localeselector
 def get_locale():
     return session.get('lang', 'en')
+
 
 
 @app.route('/set_language/<lang>')
