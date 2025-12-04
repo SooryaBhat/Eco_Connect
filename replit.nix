@@ -13,5 +13,8 @@
     pkgs.python310Packages.pillow
     pkgs.python310Packages.pymysql
     pkgs.python310Packages.gunicorn
+
+    # Babel (for translations)
+    pkgs.python310Packages.babel
   ];
 }
