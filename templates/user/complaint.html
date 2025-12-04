@@ -1,50 +1,59 @@
 {% extends "base.html" %}
 
-{% block title %}Submit Complaint{% endblock %}
-
+{% block title %}{{ tr("Submit a Complaint") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
+
     <div class="row">
         <div class="col-12">
             <div class="card bg-success text-white mb-4">
                 <div class="card-body text-center">
-                    <h3><i class="fas fa-user-circle"></i> Welcome, {{ current_user.username }}!</h3>
+                    <h3><i class="fas fa-user-circle"></i> {{ tr("Welcome") }}, {{ current_user.username }}!</h3>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Complaint Form -->
     <div class="row">
         <div class="col-lg-8 offset-lg-2">
             <div class="card shadow">
+
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-exclamation-circle"></i> Submit a Complaint</h5>
+                    <h5><i class="fas fa-exclamation-circle"></i> {{ tr("Submit a Complaint") }}</h5>
                 </div>
+
                 <div class="card-body">
+
                     <form method="POST" action="{{ url_for('user_complaint') }}">
+
                         <div class="mb-3">
-                            <label for="title" class="form-label">Complaint Title</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
+                            <label class="form-label">{{ tr("Complaint Title") }}</label>
+                            <input type="text" class="form-control" name="title" required>
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label for="location" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="location" name="location" value="{{ current_user.location }}" required>
+                            <label class="form-label">{{ tr("Location") }}</label>
+                            <input type="text" class="form-control" name="location"
+                                   value="{{ current_user.location }}" required>
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+                            <label class="form-label">{{ tr("Description") }}</label>
+                            <textarea name="description" class="form-control" rows="5" required></textarea>
                         </div>
-                        
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="fas fa-paper-plane"></i> Submit Complaint
+
+                        <button class="btn btn-success w-100">
+                            <i class="fas fa-paper-plane"></i> {{ tr("Submit Complaint") }}
                         </button>
+
                     </form>
+
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

@@ -1,66 +1,58 @@
 {% extends "base.html" %}
 
-{% block title %}Complaint Details{% endblock %}
-
+{% block title %}{{ tr("Complaint Details") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card bg-primary text-white mb-4">
-                <div class="card-body text-center">
-                    <h3><i class="fas fa-landmark"></i> Welcome, {{ current_user.username }}!</h3>
-                </div>
-            </div>
+
+    <div class="card bg-primary text-white mb-4">
+        <div class="card-body text-center">
+            <h3><i class="fas fa-landmark"></i> {{ tr("Welcome") }}, {{ current_user.username }}!</h3>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Regional Complaint Details</h5>
-                </div>
-                <div class="card-body">
-                    {% if complaints %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Title</th>
-                                    <th>User</th>
-                                    <th>Location</th>
-                                    <th>Description</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for complaint in complaints %}
-                                <tr>
-                                    <td>{{ complaint.id }}</td>
-                                    <td><strong>{{ complaint.title }}</strong></td>
-                                    <td>{{ complaint.user.username }}</td>
-                                    <td>{{ complaint.location }}</td>
-                                    <td>{{ complaint.description[:50] }}...</td>
-                                    <td>
-                                        <span class="badge bg-{{ 'danger' if complaint.status == 'Pending' else 'success' }}">
-                                            {{ complaint.status }}
-                                        </span>
-                                    </td>
-                                    <td>{{ complaint.created_at.strftime('%Y-%m-%d') }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <p class="text-muted text-center">No complaints in your region.</p>
-                    {% endif %}
-                </div>
-            </div>
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> {{ tr("Regional Complaint Details") }}</h5>
+        </div>
+
+        <div class="card-body">
+
+            {% if complaints %}
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>{{ tr("Title") }}</th>
+                        <th>{{ tr("User") }}</th>
+                        <th>{{ tr("Location") }}</th>
+                        <th>{{ tr("Description") }}</th>
+                        <th>{{ tr("Status") }}</th>
+                        <th>{{ tr("Date") }}</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for c in complaints %}
+                    <tr>
+                        <td>{{ c.id }}</td>
+                        <td>{{ c.title }}</td>
+                        <td>{{ c.user.username }}</td>
+                        <td>{{ c.location }}</td>
+                        <td>{{ c.description[:50] }}...</td>
+                        <td>{{ tr(c.status) }}</td>
+                        <td>{{ c.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% else %}
+            <p class="text-muted text-center">{{ tr("No complaints in your region.") }}</p>
+            {% endif %}
+
         </div>
     </div>
+
 </div>
 {% endblock %}

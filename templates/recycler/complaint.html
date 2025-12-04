@@ -1,85 +1,103 @@
 {% extends "base.html" %}
 
-{% block title %}Complaints{% endblock %}
-
+{% block title %}{{ tr("Complaints") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
+
     <div class="row">
         <div class="col-12">
             <div class="card bg-success text-white mb-4">
                 <div class="card-body text-center">
-                    <h3><i class="fas fa-industry"></i> Welcome, {{ current_user.username }}!</h3>
+                    <h3><i class="fas fa-industry"></i> {{ tr("Welcome") }}, {{ current_user.username }}!</h3>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Submit Complaint -->
     <div class="row mb-4">
         <div class="col-lg-8 offset-lg-2">
             <div class="card shadow">
+
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Submit a Complaint</h5>
+                    <h5 class="mb-0"><i class="fas fa-plus-circle"></i> {{ tr("Submit a Complaint") }}</h5>
                 </div>
+
                 <div class="card-body">
                     <form method="POST" action="{{ url_for('recycler_complaint') }}">
+
                         <div class="mb-3">
-                            <label for="title" class="form-label">Complaint Title</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
+                            <label class="form-label">{{ tr("Complaint Title") }}</label>
+                            <input type="text" class="form-control" name="title" required>
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label for="location" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="location" name="location" value="{{ current_user.location }}" required>
+                            <label class="form-label">{{ tr("Location") }}</label>
+                            <input type="text" class="form-control" name="location"
+                                   value="{{ current_user.location }}" required>
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            <label class="form-label">{{ tr("Description") }}</label>
+                            <textarea class="form-control" rows="4" name="description" required></textarea>
                         </div>
-                        
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="fas fa-paper-plane"></i> Submit Complaint
+
+                        <button class="btn btn-success w-100">
+                            <i class="fas fa-paper-plane"></i> {{ tr("Submit Complaint") }}
                         </button>
+
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
 
+    <!-- Complaints List -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
+
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-list"></i> My Complaints</h5>
+                    <h5 class="mb-0"><i class="fas fa-list"></i> {{ tr("My Complaints") }}</h5>
                 </div>
+
                 <div class="card-body">
                     {% if complaints %}
                     <div class="row">
                         {% for complaint in complaints %}
                         <div class="col-md-6 mb-3">
+
                             <div class="card border-{{ 'danger' if complaint.status == 'Pending' else 'success' }}">
                                 <div class="card-header">
                                     <strong>{{ complaint.title }}</strong>
-                                    <span class="badge bg-{{ 'danger' if complaint.status == 'Pending' else 'success' }} float-end">
-                                        {{ complaint.status }}
+                                    <span class="badge float-end bg-{{ 'danger' if complaint.status == 'Pending' else 'success' }}">
+                                        {{ tr(complaint.status) }}
                                     </span>
                                 </div>
+
                                 <div class="card-body">
-                                    <p class="card-text">{{ complaint.description }}</p>
-                                    <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ complaint.location }}</p>
-                                    <p class="mb-0 text-muted"><i class="fas fa-clock"></i> {{ complaint.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    <p>{{ complaint.description }}</p>
+                                    <p><i class="fas fa-map-marker-alt"></i> {{ complaint.location }}</p>
+                                    <p class="text-muted">
+                                        <i class="fas fa-clock"></i> {{ complaint.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </p>
                                 </div>
+
                             </div>
+
                         </div>
                         {% endfor %}
                     </div>
                     {% else %}
-                    <p class="text-muted text-center">No complaints submitted yet.</p>
+                    <p class="text-muted text-center">{{ tr("No complaints submitted yet.") }}</p>
                     {% endif %}
                 </div>
+
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

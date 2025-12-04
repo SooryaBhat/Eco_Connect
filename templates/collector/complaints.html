@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Complaints Received{% endblock %}
-
+{% block title %}{{ tr("Complaints Received") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
@@ -9,7 +8,7 @@
         <div class="col-12">
             <div class="card bg-success text-white mb-4">
                 <div class="card-body text-center">
-                    <h3><i class="fas fa-truck"></i> Welcome, {{ current_user.username }}!</h3>
+                    <h3><i class="fas fa-truck"></i> {{ tr("Welcome") }}, {{ current_user.username }}!</h3>
                 </div>
             </div>
         </div>
@@ -19,33 +18,42 @@
         <div class="col-12">
             <div class="card shadow">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-exclamation-circle"></i> Complaints Received</h5>
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-circle"></i> {{ tr("Complaints Received") }}
+                    </h5>
                 </div>
+
                 <div class="card-body">
                     {% if complaints %}
-                    <div class="row">
-                        {% for complaint in complaints %}
-                        <div class="col-md-6 mb-3">
-                            <div class="card border-{{ 'danger' if complaint.status == 'Pending' else 'success' }}">
-                                <div class="card-header">
-                                    <strong>{{ complaint.title }}</strong>
-                                    <span class="badge bg-{{ 'danger' if complaint.status == 'Pending' else 'success' }} float-end">
-                                        {{ complaint.status }}
-                                    </span>
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text">{{ complaint.description }}</p>
-                                    <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ complaint.location }}</p>
-                                    <p class="mb-0 text-muted"><i class="fas fa-clock"></i> {{ complaint.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                        <div class="row">
+                            {% for complaint in complaints %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-{{ 'danger' if complaint.status == 'Pending' else 'success' }}">
+                                    <div class="card-header">
+                                        <strong>{{ complaint.title }}</strong>
+                                        <span class="badge bg-{{ 'danger' if complaint.status == 'Pending' else 'success' }} float-end">
+                                            {{ tr(complaint.status) }}
+                                        </span>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">{{ complaint.description }}</p>
+                                        <p class="mb-1">
+                                            <i class="fas fa-map-marker-alt"></i> {{ complaint.location }}
+                                        </p>
+                                        <p class="mb-0 text-muted">
+                                            <i class="fas fa-clock"></i>
+                                            {{ complaint.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
-                    </div>
                     {% else %}
-                    <p class="text-muted text-center">No complaints received.</p>
+                        <p class="text-muted text-center">{{ tr("No complaints received.") }}</p>
                     {% endif %}
                 </div>
+
             </div>
         </div>
     </div>

@@ -1,161 +1,105 @@
 {% extends "base.html" %}
 
-{% block title %}User Dashboard{% endblock %}
-
+{% block title %}{{ tr("User Dashboard") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
+
     <div class="row">
         <div class="col-12">
             <div class="card bg-success text-white mb-4">
                 <div class="card-body text-center">
-                    <h3><i class="fas fa-user-circle"></i> Welcome, {{ current_user.username }}!</h3>
-                    <p class="mb-0">Location: {{ current_user.location }}</p>
+                    <h3><i class="fas fa-user-circle"></i> {{ tr("Welcome") }}, {{ current_user.username }}!</h3>
+                    <p class="mb-0">{{ tr("Location:") }} {{ current_user.location }}</p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Scan QR -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
+
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-qrcode"></i> Scan Bin QR Code</h5>
+                    <h5 class="mb-0"><i class="fas fa-qrcode"></i> {{ tr("Scan Bin QR Code") }}</h5>
                 </div>
+
                 <div class="card-body text-center">
-                    <p class="text-muted">Scan a bin QR code to view its status</p>
+                    <p class="text-muted">{{ tr("Scan a bin QR code to view its status") }}</p>
+
                     <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#scanModal">
-                        <i class="fas fa-camera"></i> Scan the Bin
+                        <i class="fas fa-camera"></i> {{ tr("Scan the Bin") }}
                     </button>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modal -->
 <div class="modal fade" id="scanModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
+
             <div class="modal-header">
-                <h5 class="modal-title">Scan Bin QR Code</h5>
+                <h5 class="modal-title">{{ tr("Scan Bin QR Code") }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
-                <div class="mb-3">
-                    <label for="binCode" class="form-label">Enter Bin Code (Demo)</label>
-                    <input type="text" class="form-control" id="binCode" placeholder="e.g., BIN001">
-                    <small class="text-muted">Try: BIN001, BIN002, or BIN003</small>
-                </div>
-                <button class="btn btn-success w-100" onclick="scanBin()">
-                    <i class="fas fa-search"></i> Fetch Bin Status
+
+                <label class="form-label">{{ tr("Enter Bin Code (Demo") }}</label>
+                <input type="text" id="binCode" class="form-control" placeholder="BIN001">
+
+                <small class="text-muted">{{ tr("Try:") }} BIN001, BIN002, BIN003</small>
+
+                <button class="btn btn-success w-100 mt-3" onclick="scanBin()">
+                    <i class="fas fa-search"></i> {{ tr("Fetch Bin Status") }}
                 </button>
-                
-                <div id="binResult" class="mt-4" style="display: none;">
+
+                <!-- Result -->
+                <div id="binResult" class="mt-4" style="display:none;">
                     <div class="card">
+
                         <div class="card-header bg-success text-white">
-                            <h6 class="mb-0">Bin Details</h6>
+                            <h6>{{ tr("Bin Details") }}</h6>
                         </div>
+
                         <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="col-6">
-                                    <strong>Bin Code:</strong>
-                                    <p id="binCodeDisplay"></p>
-                                </div>
-                                <div class="col-6">
-                                    <strong>Location:</strong>
-                                    <p id="binLocation"></p>
-                                </div>
+
+                            <strong>Bin Code:</strong>
+                            <p id="binCodeDisplay"></p>
+
+                            <strong>{{ tr("Location:") }}</strong>
+                            <p id="binLocation"></p>
+
+                            <strong>{{ tr("Recyclable Weight:") }}</strong>
+                            <p id="recyclableWeight"></p>
+
+                            <strong>{{ tr("Non-Recyclable Weight:") }}</strong>
+                            <p id="nonRecyclableWeight"></p>
+
+                            <strong>{{ tr("Fill Percentage:") }}</strong>
+                            <div class="progress" style="height:25px;">
+                                <div id="fillProgress" class="progress-bar"></div>
                             </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-6">
-                                    <strong>Recyclable Weight:</strong>
-                                    <p id="recyclableWeight"></p>
-                                </div>
-                                <div class="col-6">
-                                    <strong>Non-Recyclable Weight:</strong>
-                                    <p id="nonRecyclableWeight"></p>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <strong>Fill Percentage:</strong>
-                                <div class="progress" style="height: 25px;">
-                                    <div id="fillProgress" class="progress-bar" role="progressbar"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-6">
-                                    <strong>Last Cleaned:</strong>
-                                    <p id="lastCleaned"></p>
-                                </div>
-                                <div class="col-6">
-                                    <strong>Status:</strong>
-                                    <p id="binStatus"></p>
-                                </div>
-                            </div>
+
+                            <strong>{{ tr("Last Cleaned:") }}</strong>
+                            <p id="lastCleaned"></p>
+
+                            <strong>{{ tr("Status") }}:</strong>
+                            <p id="binStatus"></p>
+
                         </div>
+
                     </div>
                 </div>
+
             </div>
+
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-function scanBin() {
-    const binCode = document.getElementById('binCode').value;
-    
-    if (!binCode) {
-        alert('Please enter a bin code');
-        return;
-    }
-    
-    fetch('/user/scan_bin', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ bin_code: binCode })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const bin = data.bin;
-            document.getElementById('binCodeDisplay').textContent = bin.code;
-            document.getElementById('binLocation').textContent = bin.location;
-            document.getElementById('recyclableWeight').textContent = bin.recyclable_weight + ' kg';
-            document.getElementById('nonRecyclableWeight').textContent = bin.non_recyclable_weight + ' kg';
-            document.getElementById('lastCleaned').textContent = bin.last_cleaned;
-            
-            const fillPct = bin.fill_percentage;
-            const progressBar = document.getElementById('fillProgress');
-            progressBar.style.width = fillPct + '%';
-            progressBar.textContent = fillPct + '%';
-            
-            if (bin.status === 'Urgent') {
-                progressBar.className = 'progress-bar bg-danger';
-            } else if (bin.status === 'Medium') {
-                progressBar.className = 'progress-bar bg-warning';
-            } else {
-                progressBar.className = 'progress-bar bg-success';
-            }
-            
-            document.getElementById('binStatus').innerHTML = 
-                `<span class="badge ${bin.status === 'Urgent' ? 'bg-danger' : bin.status === 'Medium' ? 'bg-warning' : 'bg-success'}">${bin.status}</span>`;
-            
-            document.getElementById('binResult').style.display = 'block';
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error fetching bin data');
-    });
-}
-</script>
 {% endblock %}
