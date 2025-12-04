@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Collector Dashboard{% endblock %}
-
-
+{% block title %}{{ tr("Collector Dashboard") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
@@ -10,8 +8,8 @@
         <div class="col-12">
             <div class="card bg-success text-white mb-4">
                 <div class="card-body text-center">
-                    <h3><i class="fas fa-truck"></i> Welcome, {{ current_user.username }}!</h3>
-                    <p class="mb-0">Collector - {{ current_user.location }}</p>
+                    <h3><i class="fas fa-truck"></i> {{ tr("Welcome") }}, {{ current_user.username }}!</h3>
+                    <p class="mb-0">{{ tr("Collector") }} - {{ current_user.location }}</p>
                 </div>
             </div>
         </div>
@@ -22,27 +20,29 @@
         <div class="col-md-4 mb-3">
             <div class="card text-white bg-danger">
                 <div class="card-body text-center">
-                    <h5>Urgent</h5>
+                    <h5>{{ tr("Urgent") }}</h5>
                     <h2>{{ bins|selectattr('status', 'equalto', 'Urgent')|list|length }}</h2>
-                    <p class="mb-0">Bins needing immediate attention</p>
+                    <p class="mb-0">{{ tr("Bins needing immediate attention") }}</p>
                 </div>
             </div>
         </div>
+
         <div class="col-md-4 mb-3">
             <div class="card text-white bg-warning">
                 <div class="card-body text-center">
-                    <h5>Medium</h5>
+                    <h5>{{ tr("Medium") }}</h5>
                     <h2>{{ bins|selectattr('status', 'equalto', 'Medium')|list|length }}</h2>
-                    <p class="mb-0">Bins filling up</p>
+                    <p class="mb-0">{{ tr("Bins filling up") }}</p>
                 </div>
             </div>
         </div>
+
         <div class="col-md-4 mb-3">
             <div class="card text-white bg-success">
                 <div class="card-body text-center">
-                    <h5>Good</h5>
+                    <h5>{{ tr("Good") }}</h5>
                     <h2>{{ bins|selectattr('status', 'equalto', 'Enough Space')|list|length }}</h2>
-                    <p class="mb-0">Bins with enough space</p>
+                    <p class="mb-0">{{ tr("Bins with enough space") }}</p>
                 </div>
             </div>
         </div>
@@ -53,7 +53,7 @@
         <div class="col-12">
             <div class="card shadow">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-trash-alt"></i> Bin Status Overview</h5>
+                    <h5 class="mb-0"><i class="fas fa-trash-alt"></i> {{ tr("Bin Status Overview") }}</h5>
                 </div>
                 <div class="card-body">
                     {% if bins %}
@@ -61,11 +61,11 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Bin Code</th>
-                                    <th>Location</th>
-                                    <th>Fill %</th>
-                                    <th>Last Cleaned</th>
-                                    <th>Status</th>
+                                    <th>{{ tr("Bin Code") }}</th>
+                                    <th>{{ tr("Location") }}</th>
+                                    <th>{{ tr("Fill %") }}</th>
+                                    <th>{{ tr("Last Cleaned") }}</th>
+                                    <th>{{ tr("Status") }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -84,13 +84,13 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else 'Never' }}</td>
+                                    <td>{{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else tr("Never") }}</td>
                                     <td>
                                         <span class="badge 
                                             {% if bin.status == 'Urgent' %}bg-danger
                                             {% elif bin.status == 'Medium' %}bg-warning
                                             {% else %}bg-success{% endif %}">
-                                            {{ bin.status }}
+                                            {{ tr(bin.status) }}
                                         </span>
                                     </td>
                                 </tr>
@@ -99,7 +99,7 @@
                         </table>
                     </div>
                     {% else %}
-                    <p class="text-muted text-center">No bins assigned to your location.</p>
+                    <p class="text-muted text-center">{{ tr("No bins assigned to your location.") }}</p>
                     {% endif %}
                 </div>
             </div>

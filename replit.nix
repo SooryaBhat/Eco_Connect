@@ -7,9 +7,6 @@
 
     pkgs.python311Packages.flask
     pkgs.python311Packages.flask_login
-    pkgs.python311Packages.jinja2
-    pkgs.python311Packages.babel
-    pkgs.python311Packages.flask_babel
 
     pkgs.python311Packages.sqlalchemy
     pkgs.python311Packages.pymysql

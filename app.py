@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -9,29 +8,28 @@ from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 import os
 from functools import wraps
-from flask_babel import Babel, gettext as _
-
+from translations import translations
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET',
                                           'your-secret-key-change-this')
-babel = Babel(app)
-
-app.config['BABEL_DEFAULT_LOCALE'] = 'en'
-app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'kn', 'tulu']
-app.config['BABEL_DEFAULT_TIMEZONE'] = 'UTC'
-
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+from flask import session
+
+
+def tr(text):
+    lang = session.get("lang", "en")
+    return translations.get(lang, {}).get(text, text)
+
+
+app.jinja_env.globals.update(tr=tr)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 Base = declarative_base()
-
 DATABASE_URL = os.environ.get('DATABASE_URL')
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
@@ -512,18 +510,16 @@ def government_transactions():
 def government_analytics():
     return render_template('government/analytics.html')
 
+
 @app.route('/api/bin-stats')
 def bin_stats():
     urgent = Bin.query.filter_by(status="Urgent").count()
     medium = Bin.query.filter_by(status="Medium").count()
     good = Bin.query.filter_by(status="Enough Space").count()
 
-    return jsonify({
-        "urgent": urgent,
-        "medium": medium,
-        "good": good
-    })
-    
+    return jsonify({"urgent": urgent, "medium": medium, "good": good})
+
+
 @app.route('/update_weight', methods=['POST'])
 def update_weight():
     data = request.get_json()
@@ -548,9 +544,14 @@ def update_weight():
 
     db_session.commit()
 
-    return jsonify({"success": True, "message": "Weight updated!", 
-                    "recyclable_weight": bin_obj.recyclable_weight,
-                    "status": bin_obj.status})
+    return jsonify({
+        "success": True,
+        "message": "Weight updated!",
+        "recyclable_weight": bin_obj.recyclable_weight,
+        "status": bin_obj.status
+    })
+
+
 @app.route('/get_bin_weight/<bin_code>', methods=['GET'])
 def get_bin_weight(bin_code):
     try:
@@ -569,19 +570,14 @@ def get_bin_weight(bin_code):
 
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
-@babel.localeselector
-def get_locale():
-    return session.get('lang', 'en')
 
 
-
-@app.route('/set_language/<lang>')
+@app.route("/setlang/<lang>")
 def set_language(lang):
-    supported = ['en', 'kn', 'tulu']
-    if lang in supported:
-        session['lang'] = lang
-    return redirect(request.referrer or url_for('index'))
-    
+    if lang in ("en", "kn", "tulu"):
+        session["lang"] = lang
+    return redirect(request.referrer or url_for("index"))
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
