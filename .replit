@@ -1,16 +1,7 @@
-modules = ["nodejs-20", "python-3.11"]
+modules = ["python-3.11"]
 [agent]
 expertMode = true
 
 [nix]
 channel = "stable-25_05"
-packages = ["freetype", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "tcl", "tk", "zlib", "u-root-cmds", "python313Packages.babel"]
-
-[userenv]
-
-[userenv.shared]
-DATABASE_URL = "mysql+pymysql://uhorxcjbhnlbu3k8:R2ryMxhjdpvYrCPEvR6s@b1euh9kivg17367rolt1-mysql.services.clever-cloud.com/b1euh9kivg17367rolt1?charset=utf8mb4"
-
-[[ports]]
-localPort = 5000
-externalPort = 80
+packages = ["freetype", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "tcl", "tk", "zlib"]
