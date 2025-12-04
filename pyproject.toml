@@ -6,7 +6,6 @@ requires-python = ">=3.11"
 
 dependencies = [
    "Flask==2.3.3",
-    "babel"==2.0.0,
     "Flask-Login==0.6.3",
     "Flask-Babel==2.0.0",
     "SQLAlchemy==2.0.40",
