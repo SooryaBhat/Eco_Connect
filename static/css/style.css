@@ -155,3 +155,15 @@ body {
   .progress { height: 18px; }
   .progress-bar { font-size: 0.9rem; }
 }
+
+.modal {
+  z-index: 2000 !important;
+}
+
+.modal-backdrop {
+  z-index: 1500 !important;
+}
+.modal-dialog {
+    margin-top: 80px !important;
+}
+

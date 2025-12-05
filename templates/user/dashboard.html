@@ -103,3 +103,48 @@
     </div>
 </div>
 {% endblock %}
+{% block extra_js %}
+<script>
+function scanBin() {
+    let binCode = document.getElementById("binCode").value.trim();
+    let resultBox = document.getElementById("binResult");
+
+    if (!binCode) {
+        alert("Please enter a Bin Code.");
+        return;
+    }
+
+    fetch(`/api/bin/${binCode}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                // Show message if bin does not exist
+                resultBox.style.display = "block";
+                resultBox.innerHTML = `
+                    <div class="alert alert-danger text-center">
+                        ${data.error}
+                    </div>`;
+                return;
+            }
+
+            // Show modal result section
+            document.getElementById("binCodeDisplay").textContent = data.bin_code;
+            document.getElementById("binLocation").textContent = data.location;
+            document.getElementById("recyclableWeight").textContent = data.recyclable_weight + " kg";
+            document.getElementById("nonRecyclableWeight").textContent = data.non_recyclable_weight + " kg";
+            document.getElementById("lastCleaned").textContent = data.last_cleaned;
+            document.getElementById("binStatus").textContent = data.status;
+
+            // Fill %
+            document.getElementById("fillProgress").style.width = data.fill_percentage + "%";
+            document.getElementById("fillProgress").textContent = Math.round(data.fill_percentage) + "%";
+
+            resultBox.style.display = "block";
+        })
+        .catch(err => {
+            console.log(err);
+            alert("Error connecting to server");
+        });
+}
+</script>
+{% endblock %}

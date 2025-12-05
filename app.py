@@ -603,6 +603,23 @@ def set_language(lang):
         session["lang"] = lang
     return redirect(request.referrer or url_for("index"))
 
+@app.route("/api/bin/<bin_code>")
+def api_get_bin(bin_code):
+    bin = Bins.query.filter_by(bin_code=bin_code).first()
+
+    if not bin:
+        return jsonify({"error": "Bin not found"}), 404
+
+    return jsonify({
+        "bin_code": bin.bin_code,
+        "location": bin.location,
+        "recyclable_weight": bin.recyclable_weight,
+        "non_recyclable_weight": bin.non_recyclable_weight,
+        "fill_percentage": bin.get_fill_percentage(),
+        "last_cleaned": bin.last_cleaned.strftime("%Y-%m-%d") if bin.last_cleaned else "Never",
+        "status": bin.status
+    })
+
 
 
 if __name__ == '__main__':
