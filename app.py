@@ -597,6 +597,11 @@ def analytics_data():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@app.route("/setlang/<lang>")
+def set_language(lang):
+    if lang in ("en", "kn", "tulu"):
+        session["lang"] = lang
+    return redirect(request.referrer or url_for("index"))
 
 
 
