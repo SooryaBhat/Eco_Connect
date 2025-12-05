@@ -603,7 +603,7 @@ def set_language(lang):
         session["lang"] = lang
     return redirect(request.referrer or url_for("index"))
 
-@app.route("/api/bin/<bin_code>")
+@app.route('/api/bin/<bin_code>')
 def api_get_bin(bin_code):
     bin = Bins.query.filter_by(bin_code=bin_code).first()
 

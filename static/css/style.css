@@ -167,3 +167,11 @@ body {
     margin-top: 80px !important;
 }
 
+/* Fix modal not clickable / going behind elements */
+.modal-backdrop {
+    z-index: 2000 !important;
+}
+
+.modal {
+    z-index: 3000 !important;
+}
