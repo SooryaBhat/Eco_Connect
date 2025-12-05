@@ -1,0 +1,66 @@
+{% if current_user.is_authenticated %}
+<style>
+/* MOBILE ONLY - Hide on desktop */
+@media (max-width: 768px) {
+    .mobile-nav {
+        display: flex;
+    }
+}
+@media (min-width: 769px) {
+    .mobile-nav {
+        display: none;
+    }
+}
+
+.mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    border-top: 1px solid #ccc;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 9999;
+}
+
+.mobile-nav a {
+    color: #000;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+}
+</style>
+
+<div class="mobile-nav">
+
+    <!-- USER -->
+    {% if current_user.role == 'user' %}
+        <a href="/user/dashboard">Dashboard</a>
+        <a href="/user/complaints">Complaints</a>
+        <a href="/user/sell">Sell</a>
+
+    <!-- COLLECTOR -->
+    {% elif current_user.role == 'collector' %}
+        <a href="/collector/dashboard">Dashboard</a>
+        <a href="/collector/complaints">Complaints</a>
+        <a href="/collector/sell">Sell</a>
+        <a href="/collector/analytics">Analytics</a>
+
+    <!-- RECYCLER -->
+    {% elif current_user.role == 'recycler' %}
+        <a href="/recycler/buy">Buy</a>
+        <a href="/recycler/complaints">Complaints</a>
+        <a href="/recycler/sell">Sell</a>
+
+    <!-- GOVERNMENT -->
+    {% elif current_user.role == 'government' %}
+        <a href="/gov/dashboard">Dashboard</a>
+        <a href="/gov/complaints">Complaints</a>
+        <a href="/gov/transactions">Transactions</a>
+        <a href="/gov/analytics">Analytics</a>
+
+    {% endif %}
+</div>
+{% endif %}

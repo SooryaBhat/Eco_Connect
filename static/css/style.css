@@ -25,18 +25,31 @@ body {
 }
 .navbar-brand, .navbar-text { color: #fff !important; }
 
-/* Offcanvas / Sidebar (mobile uses bootstrap offcanvas; desktop we show it fixed) */
+/* Force header text center even when sidebar shifts UI */
+.header-center {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* Offcanvas / Sidebar */
 #sidebar {
   width: var(--sidebar-width);
   background-color: var(--accent);
   color: #fff;
 }
-/* Desktop fix: sidebar closed by default and opens when clicking hamburger */
+
+/* ------------------------
+   DESKTOP SIDEBAR FIXES
+------------------------ */
 @media (min-width: 992px) {
+
+    /* Sidebar hidden initially */
     #sidebar.offcanvas-start {
         position: fixed;
         top: var(--navbar-height);
-        left: -250px; /* hidden */
+        left: -250px;
         width: var(--sidebar-width);
         height: calc(100vh - var(--navbar-height));
         background-color: var(--accent);
@@ -44,25 +57,34 @@ body {
         z-index: 1040;
     }
 
-    /* When sidebar is opened */
+    /* When toggled open */
     #sidebar.show {
         left: 0 !important;
         visibility: visible !important;
         transform: none !important;
     }
 
-    /* Main content full width */
-    .content-container {
-        margin-left: 0 !important;
+    /* Prevent dark overlay on desktop */
+    .offcanvas-backdrop {
+        display: none !important;
     }
 
-    /* Keep close button visible only in mobile */
+    body.offcanvas-backdrop {
+        overflow: visible !important;
+    }
+
+    /* Main content always clickable */
+    .content-container {
+        margin-left: 0 !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Close button only for mobile */
     .offcanvas .btn-close {
         display: none !important;
     }
 }
-
-
 
 /* Offcanvas nav links styling */
 #sidebar .nav-link {
@@ -86,7 +108,9 @@ body {
 /* Progress bar text contrast */
 .progress-bar { font-weight: 600; color: #fff; }
 
-/* Bottom nav (mobile) */
+/* ------------------------
+   BOTTOM NAV (MOBILE ONLY)
+------------------------ */
 .bottom-nav {
   display: flex;
   position: fixed;
@@ -104,22 +128,29 @@ body {
 .bottom-nav a { color: var(--accent); text-decoration: none; font-size: 12px; display:block; }
 .bottom-nav i { font-size: 18px; display:block; margin-bottom: 2px; }
 
-/* Ensure table and card content are responsive */
+/* Responsive table */
 .table-responsive { overflow-x: auto; }
 
-/* small tweaks for the "welcome" card so it doesn't feel cramped on mobile */
+/* Mobile welcome spacing */
 @media (max-width: 991px) {
   .card.bg-success.text-white.mb-4 { margin-top: 6px; }
-  .content-container { padding-bottom: 84px; } /* allow space for bottom nav */
+  .content-container { padding-bottom: 84px; }
 }
 
-/* Utility: make sure any in-page top content has breathing room below navbar */
+/* Utility: breathing room for top content */
 .page-top-space { margin-top: 8px; margin-bottom: 12px; }
 
-/* Minor cosmetic touches */
-.placeholder-analytics { min-height: 260px; display:flex; align-items:center; justify-content:center; color:#888; border-radius:8px; }
+/* Analytics placeholder */
+.placeholder-analytics { 
+  min-height: 260px; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center; 
+  color:#888; 
+  border-radius:8px; 
+}
 
-/* small screens tweak: larger progress bar height */
+/* small screens tweak */
 @media (max-width: 576px) {
   .progress { height: 18px; }
   .progress-bar { font-size: 0.9rem; }
