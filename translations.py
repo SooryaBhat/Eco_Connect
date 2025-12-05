@@ -121,7 +121,15 @@ translations = {
         "Non-Recyclable Weight:": "Non-Recyclable Weight:",
         "Fill Percentage:": "Fill Percentage:",
         "Last Cleaned:": "Last Cleaned:",
-        "No complaints submitted yet.": "No complaints submitted yet."
+        "No complaints submitted yet.": "No complaints submitted yet.",
+        "Analytics": "Analytics",
+        "Analytics Dashboard": "Analytics Dashboard",
+        "Recyclable vs Non-Recyclable Weight (Grams)": "Recyclable vs Non-Recyclable Weight (Grams)",
+        "Bin Status Distribution": "Bin Status Distribution",
+        "Recyclable (g)": "Recyclable (g)",
+        "Non-Recyclable (g)": "Non-Recyclable (g)"
+        
+
         
 
     },
@@ -248,7 +256,15 @@ translations = {
         "Non-Recyclable Weight:": "ಅಪುನರ್ವಿನಿಯೋಗ ತೂಕ:",
         "Fill Percentage:": "ತುಂಬಿದ ಪ್ರಮಾಣ:",
         "Last Cleaned:": "ಕೊನೆಗೆ ಸ್ವಚ್ಛಗೊಳಿಸಿದ:",
-        "No complaints submitted yet.": "ಇನ್ನೂ ಯಾವುದೇ ದೂರು ಸಲ್ಲಿಸಲಾಗಿಲ್ಲ."
+        "No complaints submitted yet.": "ಇನ್ನೂ ಯಾವುದೇ ದೂರು ಸಲ್ಲಿಸಲಾಗಿಲ್ಲ.",
+        "Analytics": "ವಿಶ್ಲೇಷಣೆ",
+        "Analytics Dashboard": "ವಿಶ್ಲೇಷಣಾ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+        "Recyclable vs Non-Recyclable Weight (Grams)": "ಪುನರ್ವಿನಿಯೋಗ vs ಅಪುನರ್ವಿನಿಯೋಗ ತೂಕ (ಗ್ರಾಂಗಳು)",
+        "Bin Status Distribution": "ಬಿನ್ ಸ್ಥಿತಿ ವಿತರಣೆ",
+        "Recyclable (g)": "ಪುನರ್ವಿನಿಯೋಗ (ಗ್ರಾಂ)",
+        "Non-Recyclable (g)": "ಅಪುನರ್ವಿನಿಯೋಗ (ಗ್ರಾಂ)"
+        
+
         
 
     },
@@ -375,6 +391,12 @@ translations = {
         "Non-Recyclable Weight:": "ನಾನ್-ರಿಸೈಕಲ್ ತೂಕ:",
         "Fill Percentage:": "ತುಂಬಿದ ಪ್ರಮಾಣ:",
         "Last Cleaned:": "ಕೊನೆ ಕ್ಲೀನ್ ಮಲ್ತಿನ:",
-        "No complaints submitted yet.": "ಇಜ್ಜಿಗೆ ದೂರು ಸಲ್ಲೆರೆಡ್ ಇಲ್ಲ."
+        "No complaints submitted yet.": "ಇಜ್ಜಿಗೆ ದೂರು ಸಲ್ಲೆರೆಡ್ ಇಲ್ಲ.",
+        "Analytics": "ವಿಶ್ಲೇಷಣೆ",
+        "Analytics Dashboard": "ವಿಶ್ಲೇಷಣೆ ಡ್ಯಾಶ್ಬೋರ್ಡು",
+        "Recyclable vs Non-Recyclable Weight (Grams)": "ರಿಸೈಕಲ್ vs ನಾನ್–ರಿಸೈಕಲ್ ತೂಕ (ಗ್ರಾಂ)",
+        "Bin Status Distribution": "ಬಿನ್ ಸ್ಥಿತಿ ವಿತರಣೊ",
+        "Recyclable (g)": "ರಿಸೈಕಲ್ (ಗ್ರಾಂ)",
+        "Non-Recyclable (g)": "ನಾನ್-ರಿಸೈಕಲ್ (ಗ್ರಾಂ)"
     }
 }

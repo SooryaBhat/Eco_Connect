@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Analytics{% endblock %}
+{% block title %}{{ tr("Analytics") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
-    <h3 class="mb-4 text-success">Analytics Dashboard</h3>
+
+    <h3 class="mb-4 text-success">{{ tr("Analytics Dashboard") }}</h3>
 
     <!-- Total Weight Bar Chart -->
     <div class="card shadow mb-4">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Recyclable vs Non-Recyclable Weight (Grams)</h5>
+            <h5 class="mb-0">{{ tr("Recyclable vs Non-Recyclable Weight (Grams)") }}</h5>
         </div>
         <div class="card-body">
             <canvas id="weightChart" height="120"></canvas>
@@ -18,12 +19,13 @@
     <!-- Status Distribution Pie Chart -->
     <div class="card shadow">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Bin Status Distribution</h5>
+            <h5 class="mb-0">{{ tr("Bin Status Distribution") }}</h5>
         </div>
         <div class="card-body">
             <canvas id="statusChart" height="120"></canvas>
         </div>
     </div>
+
 </div>
 {% endblock %}
 
@@ -32,6 +34,7 @@
 
 <script>
 async function loadAnalytics() {
+
     const response = await fetch("/analytics_data");
     const data = await response.json();
 
@@ -41,6 +44,7 @@ async function loadAnalytics() {
     const statuses = data.status;
 
     /* ---------------- BAR CHART ---------------- */
+
     const ctx1 = document.getElementById("weightChart").getContext("2d");
 
     new Chart(ctx1, {
@@ -49,12 +53,12 @@ async function loadAnalytics() {
             labels: binCodes,
             datasets: [
                 {
-                    label: "Recyclable (g)",
+                    label: "{{ tr('Recyclable (g)') }}",
                     data: recyclable,
                     backgroundColor: "rgba(46, 204, 113, 0.8)",
                 },
                 {
-                    label: "Non-Recyclable (g)",
+                    label: "{{ tr('Non-Recyclable (g)') }}",
                     data: nonRecyclable,
                     backgroundColor: "rgba(231, 76, 60, 0.8)",
                 }
@@ -69,6 +73,7 @@ async function loadAnalytics() {
     });
 
     /* ---------------- PIE CHART ---------------- */
+
     const statusCounts = {
         "Urgent": statuses.filter(s => s === "Urgent").length,
         "Medium": statuses.filter(s => s === "Medium").length,
@@ -80,7 +85,11 @@ async function loadAnalytics() {
     new Chart(ctx2, {
         type: "pie",
         data: {
-            labels: ["Urgent", "Medium", "Good"],
+            labels: [
+                "{{ tr('Urgent') }}",
+                "{{ tr('Medium') }}",
+                "{{ tr('Good') }}"
+            ],
             datasets: [{
                 data: [
                     statusCounts["Urgent"],
