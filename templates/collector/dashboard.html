@@ -4,6 +4,8 @@
 
 {% block content %}
 <div class="container my-4">
+    
+    <!-- Welcome Box -->
     <div class="row">
         <div class="col-12">
             <div class="card bg-success text-white mb-4">
@@ -15,7 +17,7 @@
         </div>
     </div>
 
-    <!-- Bin Status Summary -->
+    <!-- Status Summary -->
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
             <div class="card text-white bg-danger">
@@ -48,13 +50,14 @@
         </div>
     </div>
 
-    <!-- Bin Table -->
+    <!-- Bin Status Table -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="fas fa-trash-alt"></i> {{ tr("Bin Status Overview") }}</h5>
                 </div>
+
                 <div class="card-body">
                     {% if bins %}
                     <div class="table-responsive">
@@ -63,16 +66,32 @@
                                 <tr>
                                     <th>{{ tr("Bin Code") }}</th>
                                     <th>{{ tr("Location") }}</th>
+                                    <th>{{ tr("Recyclable (g)") }}</th>
+                                    <th>{{ tr("Non-Recyclable (g)") }}</th>
+                                    <th>{{ tr("Total (g)") }}</th>
                                     <th>{{ tr("Fill %") }}</th>
                                     <th>{{ tr("Last Cleaned") }}</th>
                                     <th>{{ tr("Status") }}</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {% for bin in bins|sort(attribute='status', reverse=true) %}
+                                {% set total_weight = (bin.recyclable_weight or 0) + (bin.non_recyclable_weight or 0) %}
                                 <tr>
                                     <td><strong>{{ bin.bin_code }}</strong></td>
                                     <td>{{ bin.location }}</td>
+
+                                    <!-- Recyclable Weight -->
+                                    <td>{{ "%.1f"|format(bin.recyclable_weight or 0) }}</td>
+
+                                    <!-- Non-Recyclable Weight -->
+                                    <td>{{ "%.1f"|format(bin.non_recyclable_weight or 0) }}</td>
+
+                                    <!-- Total -->
+                                    <td><strong>{{ "%.1f"|format(total_weight) }}</strong></td>
+
+                                    <!-- Fill Percentage -->
                                     <td>
                                         <div class="progress" style="height: 20px;">
                                             <div class="progress-bar 
@@ -84,7 +103,13 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else tr("Never") }}</td>
+
+                                    <!-- Last Cleaned -->
+                                    <td>
+                                        {{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else tr("Never") }}
+                                    </td>
+
+                                    <!-- Status -->
                                     <td>
                                         <span class="badge 
                                             {% if bin.status == 'Urgent' %}bg-danger
@@ -105,5 +130,6 @@
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

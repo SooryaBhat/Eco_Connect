@@ -67,7 +67,7 @@
         </div>
     </div>
 
-    <!-- Bin Status Table -->
+    <!-- Bin Table -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
@@ -76,7 +76,6 @@
                         <i class="fas fa-trash-alt"></i>
                         {{ tr("Regional Bin Status") }} - {{ current_user.location }}
                     </h5>
-                    <small id="lastUpdateText"></small>
                 </div>
 
                 <div class="card-body">
@@ -101,32 +100,29 @@
                                 <tr class="bin-row" data-bin-code="{{ bin.bin_code }}">
                                     <td><strong>{{ bin.bin_code }}</strong></td>
                                     <td>{{ bin.location }}</td>
-                                    <td class="recyclable-weight">{{ "%.2f"|format(bin.recyclable_weight) }}</td>
-                                    <td class="non-recyclable-weight">{{ "%.2f"|format(bin.non_recyclable_weight) }}</td>
+
+                                    <td class="recyclable-weight">{{ "%.3f"|format((bin.recyclable_weight or 0) / 1000) }}</td>
+                                    <td class="nonrecyclable-weight">{{ "%.3f"|format((bin.non_recyclable_weight or 0) / 1000) }}</td>
 
                                     <td>
-                                        <div class="progress" style="height: 20px; min-width: 80px;">
+                                        <div class="progress" style="height: 20px;">
                                             <div class="progress-bar fill-percentage
                                                 {% if bin.status == 'Urgent' %}bg-danger
                                                 {% elif bin.status == 'Medium' %}bg-warning
-                                                {% else %}bg-success
-                                                {% endif %}"
+                                                {% else %}bg-success{% endif %}"
                                                 style="width: {{ bin.get_fill_percentage() }}%">
                                                 <span class="fill-text">{{ "%.0f"|format(bin.get_fill_percentage()) }}%</span>
                                             </div>
                                         </div>
                                     </td>
 
-                                    <td class="last-cleaned">
-                                        {{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else tr("Never") }}
-                                    </td>
+                                    <td>{{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else tr("Never") }}</td>
 
                                     <td>
-                                        <span class="badge bin-status
+                                        <span class="badge bin-status 
                                             {% if bin.status == 'Urgent' %}bg-danger
                                             {% elif bin.status == 'Medium' %}bg-warning
-                                            {% else %}bg-success
-                                            {% endif %}">
+                                            {% else %}bg-success{% endif %}">
                                             {{ tr(bin.status) }}
                                         </span>
                                     </td>
@@ -135,7 +131,6 @@
                                 </tr>
                                 {% endfor %}
                             </tbody>
-
                         </table>
                     </div>
                     {% else %}
@@ -148,141 +143,57 @@
 
 </div>
 
-<!-- Styles & Script (unchanged except text) -->
-<style>
-    .bin-row.updating { background-color: #f0f8ff !important; }
-    .bin-row.urgent-flash { animation: flash 0.5s; }
-    @keyframes flash {
-        0%, 100% { background-color: transparent; }
-        50% { background-color: #ffebee; }
-    }
-    #syncIcon { transition: transform 0.3s; }
-    #syncIcon.syncing { animation: spin 1s linear infinite; }
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-</style>
-
+<!-- Live Updating Script -->
 <script>
-// BACKEND URL & refresh interval
-const BACKEND_URL = "{{ url_for('index', _external=True).rstrip('/') }}";
 const REFRESH_INTERVAL = 3000;
-const AUTO_UPDATE_ENABLED = true;
-
-const initialBins = {
-    {% for bin in bins %}
-    "{{ bin.bin_code }}": {
-        recyclable_weight: {{ bin.recyclable_weight }},
-        non_recyclable_weight: {{ bin.non_recyclable_weight }},
-        capacity: {{ bin.capacity }},
-        status: "{{ bin.status }}"
-    }{{ "," if not loop.last else "" }}
-    {% endfor %}
-};
-
-function getFillPercentage(r, nr, c) {
-    return ((r + nr) / c) * 100;
-}
-
-function getStatus(fill) {
-    if (fill >= 80) return 'Urgent';
-    if (fill >= 50) return 'Medium';
-    return 'Good';
-}
+const BACKEND_URL = "{{ url_for('index', _external=True).rstrip('/') }}";
 
 function getStatusColor(status) {
-    if (status === 'Urgent') return 'bg-danger';
-    if (status === 'Medium') return 'bg-warning';
-    return 'bg-success';
-}
-
-function updateTimestamp() {
-    document.getElementById('lastUpdate').textContent =
-        new Date().toLocaleTimeString();
+    if (status === "Urgent") return "bg-danger";
+    if (status === "Medium") return "bg-warning";
+    return "bg-success";
 }
 
 async function updateAllBins() {
-    const syncIcon = document.getElementById('syncIcon');
-    syncIcon.classList.add('syncing');
+    const rows = document.querySelectorAll(".bin-row");
 
-    try {
-        const binCodes = Object.keys(initialBins);
+    for (const row of rows) {
+        const binCode = row.dataset.binCode;
 
-        const results = await Promise.all(
-            binCodes.map(code =>
-                fetch(`${BACKEND_URL}/get_bin_weight/${code}`)
-                    .then(res => res.json())
-                    .catch(() => null)
-            )
-        );
+        try {
+            const response = await fetch(`${BACKEND_URL}/get_bin_weight/${binCode}`);
+            const data = await response.json();
 
-        results.forEach((data, index) => {
-            if (data && data.success) {
-                updateBinRow(binCodes[index], data);
-            }
-        });
+            if (!data.success) continue;
 
-        updateCounters();
-        updateTimestamp();
+            const r = parseFloat(data.recyclable_weight || 0);
+            const nr = parseFloat(data.non_recyclable_weight || 0);
+            const cap = parseFloat(data.capacity || 1);
 
-    } catch (err) {
-        console.error(err);
+            // Convert grams → kilograms
+            row.querySelector(".recyclable-weight").textContent = (r / 1000).toFixed(3);
+            row.querySelector(".nonrecyclable-weight").textContent = (nr / 1000).toFixed(3);
+
+            const fill = ((r + nr) / cap) * 100;
+            const fillBar = row.querySelector(".fill-percentage");
+
+            fillBar.style.width = fill + "%";
+            fillBar.textContent = Math.round(fill) + "%";
+            fillBar.className = "progress-bar fill-percentage " + getStatusColor(data.status);
+
+            const statusTag = row.querySelector(".bin-status");
+            statusTag.textContent = data.status;
+            statusTag.className = "badge bin-status " + getStatusColor(data.status);
+
+            row.querySelector(".last-update-time").textContent =
+                new Date().toLocaleTimeString();
+
+        } catch (err) {}
     }
-
-    syncIcon.classList.remove('syncing');
-}
-
-function updateBinRow(binCode, data) {
-    const row = document.querySelector(`tr[data-bin-code="${binCode}"]`);
-    if (!row) return;
-
-    const recyclableEl = row.querySelector('.recyclable-weight');
-    const nonRecyclableEl = row.querySelector('.non-recyclable-weight');
-    const fillEl = row.querySelector('.fill-percentage');
-    const statusEl = row.querySelector('.bin-status');
-    const lastUpdateEl = row.querySelector('.last-update-time');
-
-    const r = parseFloat(data.recyclable_weight) || 0;
-    const nr = parseFloat(data.non_recyclable_weight) || 0;
-    const cap = parseFloat(data.capacity) || 100;
-
-    recyclableEl.textContent = r.toFixed(2);
-    nonRecyclableEl.textContent = nr.toFixed(2);
-
-    const fill = getFillPercentage(r, nr, cap);
-    const newStatus = getStatus(fill);
-
-    fillEl.style.width = fill + "%";
-    fillEl.textContent = Math.round(fill) + "%";
-    fillEl.className = `progress-bar fill-percentage ${getStatusColor(newStatus)}`;
-
-    statusEl.textContent = "{{ tr('') }}" + newStatus;
-    statusEl.className = `badge bin-status ${getStatusColor(newStatus)}`;
-
-    lastUpdateEl.textContent = new Date().toLocaleTimeString();
-}
-
-function updateCounters() {
-    let urgent = 0, medium = 0, good = 0;
-
-    document.querySelectorAll('.bin-status').forEach(el => {
-        const status = el.textContent.trim();
-        if (status.includes("Urgent")) urgent++;
-        else if (status.includes("Medium")) medium++;
-        else good++;
-    });
-
-    document.getElementById('urgentCount').textContent = urgent;
-    document.getElementById('mediumCount').textContent = medium;
-    document.getElementById('goodCount').textContent = good;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    updateAllBins();
-    if (AUTO_UPDATE_ENABLED) {
-        setInterval(updateAllBins, REFRESH_INTERVAL);
-    }
+    setInterval(updateAllBins, REFRESH_INTERVAL);
 });
 </script>
 

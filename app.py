@@ -522,34 +522,40 @@ def bin_stats():
 
 @app.route('/update_weight', methods=['POST'])
 def update_weight():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    bin_code = data.get('bin_code')
-    recyclable_weight = data.get('recyclable_weight')
+        bin_code = data.get('bin_code')
+        recyclable_weight = data.get('recyclable_weight')
+        non_recyclable_weight = data.get('non_recyclable_weight')
 
-    if not bin_code or recyclable_weight is None:
-        return jsonify({"success": False, "message": "Invalid data"}), 400
+        if not bin_code:
+            return jsonify({"success": False, "message": "Missing bin_code"}), 400
 
-    # Find the bin
-    bin_obj = db_session.query(Bin).filter_by(bin_code=bin_code).first()
+        bin_obj = db_session.query(Bin).filter_by(bin_code=bin_code).first()
 
-    if not bin_obj:
-        return jsonify({"success": False, "message": "Bin not found"}), 404
+        if not bin_obj:
+            return jsonify({"success": False, "message": "Bin not found"}), 404
 
-    # Update weight into database
-    bin_obj.recyclable_weight = float(recyclable_weight)
+        # Update MySQL fields
+        bin_obj.recyclable_weight = float(recyclable_weight)
+        bin_obj.non_recyclable_weight = float(non_recyclable_weight)
 
-    # Auto-update status
-    bin_obj.update_status()
+        bin_obj.update_status()  # your existing logic
 
-    db_session.commit()
+        db_session.commit()
 
-    return jsonify({
-        "success": True,
-        "message": "Weight updated!",
-        "recyclable_weight": bin_obj.recyclable_weight,
-        "status": bin_obj.status
-    })
+        return jsonify({
+            "success": True,
+            "message": "Weights updated successfully!",
+            "recyclable_weight": bin_obj.recyclable_weight,
+            "non_recyclable_weight": bin_obj.non_recyclable_weight,
+            "status": bin_obj.status
+        }), 200
+
+    except Exception as e:
+        db_session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @app.route('/get_bin_weight/<bin_code>', methods=['GET'])
@@ -572,11 +578,26 @@ def get_bin_weight(bin_code):
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-@app.route("/setlang/<lang>")
-def set_language(lang):
-    if lang in ("en", "kn", "tulu"):
-        session["lang"] = lang
-    return redirect(request.referrer or url_for("index"))
+@app.route('/get_bin_weight/<bin_code>', methods=['GET'])
+def get_bin_weight(bin_code):
+    try:
+        # Fetch bin from database
+        bin_obj = db_session.query(Bin).filter_by(bin_code=bin_code).first()
+
+        if not bin_obj:
+            return jsonify({"success": False, "message": "Bin not found"}), 404
+
+        return jsonify({
+            "success": True,
+            "bin_code": bin_obj.bin_code,
+            "recyclable_weight": bin_obj.recyclable_weight,
+            "non_recyclable_weight": bin_obj.non_recyclable_weight,   # ⭐ NEW
+            "status": bin_obj.status,
+            "capacity": bin_obj.capacity
+        }), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 if __name__ == '__main__':
