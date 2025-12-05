@@ -580,6 +580,25 @@ def get_bin_weight(bin_code):
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
+@app.route('/analytics_data')
+def analytics_data():
+    try:
+        bins = db_session.query(Bin).all()
+
+        # Prepare JSON output for charts
+        result = {
+            "bin_codes": [b.bin_code for b in bins],
+            "recyclable": [float(b.recyclable_weight or 0) for b in bins],
+            "non_recyclable": [float(b.non_recyclable_weight or 0) for b in bins],
+            "status": [b.status for b in bins]
+        }
+
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)

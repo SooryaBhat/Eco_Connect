@@ -5,32 +5,99 @@
 <div class="container my-4">
     <h3 class="mb-4 text-success">Analytics Dashboard</h3>
 
-    <!-- BAR CHART -->
+    <!-- Total Weight Bar Chart -->
     <div class="card shadow mb-4">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Bin Status Summary</h5>
+            <h5 class="mb-0">Recyclable vs Non-Recyclable Weight (Grams)</h5>
         </div>
         <div class="card-body">
-            <canvas id="statusChart" height="100"></canvas>
+            <canvas id="weightChart" height="120"></canvas>
         </div>
     </div>
 
-    <!-- PIE CHART -->
+    <!-- Status Distribution Pie Chart -->
     <div class="card shadow">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Status Distribution</h5>
+            <h5 class="mb-0">Bin Status Distribution</h5>
         </div>
         <div class="card-body">
-            <canvas id="pieChart" height="120"></canvas>
+            <canvas id="statusChart" height="120"></canvas>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Your custom JS -->
-<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+async function loadAnalytics() {
+    const response = await fetch("/analytics_data");
+    const data = await response.json();
+
+    const binCodes = data.bin_codes;
+    const recyclable = data.recyclable;
+    const nonRecyclable = data.non_recyclable;
+    const statuses = data.status;
+
+    /* ---------------- BAR CHART ---------------- */
+    const ctx1 = document.getElementById("weightChart").getContext("2d");
+
+    new Chart(ctx1, {
+        type: "bar",
+        data: {
+            labels: binCodes,
+            datasets: [
+                {
+                    label: "Recyclable (g)",
+                    data: recyclable,
+                    backgroundColor: "rgba(46, 204, 113, 0.8)",
+                },
+                {
+                    label: "Non-Recyclable (g)",
+                    data: nonRecyclable,
+                    backgroundColor: "rgba(231, 76, 60, 0.8)",
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    /* ---------------- PIE CHART ---------------- */
+    const statusCounts = {
+        "Urgent": statuses.filter(s => s === "Urgent").length,
+        "Medium": statuses.filter(s => s === "Medium").length,
+        "Good": statuses.filter(s => s === "Good" || s === "Enough Space").length
+    };
+
+    const ctx2 = document.getElementById("statusChart").getContext("2d");
+
+    new Chart(ctx2, {
+        type: "pie",
+        data: {
+            labels: ["Urgent", "Medium", "Good"],
+            datasets: [{
+                data: [
+                    statusCounts["Urgent"],
+                    statusCounts["Medium"],
+                    statusCounts["Good"]
+                ],
+                backgroundColor: [
+                    "rgba(231, 76, 60, 0.8)",
+                    "rgba(241, 196, 15, 0.8)",
+                    "rgba(46, 204, 113, 0.8)"
+                ]
+            }]
+        }
+    });
+
+}
+
+loadAnalytics();
+</script>
 {% endblock %}
