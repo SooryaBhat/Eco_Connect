@@ -1,130 +1,141 @@
 {% extends "base.html" %}
 
-{% block title %}{{ tr("Collector Dashboard") }}{% endblock %}
+{% block title %}{{ tr("Government Dashboard") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
-    
-    <!-- Welcome Box -->
+
+    <!-- Header Card -->
     <div class="row">
         <div class="col-12">
-            <div class="card bg-success text-white mb-4">
+            <div class="card bg-primary text-white mb-4">
                 <div class="card-body text-center">
-                    <h3><i class="fas fa-truck"></i> {{ tr("Welcome") }}, {{ current_user.username }}!</h3>
-                    <p class="mb-0">{{ tr("Collector") }} - {{ current_user.location }}</p>
+                    <h3>
+                        <i class="fas fa-landmark"></i>
+                        {{ tr("Welcome") }}, {{ current_user.username }}!
+                    </h3>
+                    <p class="mb-0">{{ tr("Government Official") }} - {{ current_user.location }}</p>
+                    <small class="mt-2">
+                        <i class="fas fa-sync-alt" id="syncIcon"></i>
+                        {{ tr("Last Update") }}: <span id="lastUpdate">Just now</span>
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Status Summary -->
+    <!-- Summary Cards -->
     <div class="row mb-4">
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body text-center">
+                    <h5>{{ tr("Total Bins") }}</h5>
+                    <h2 id="totalBins">{{ bins|length }}</h2>
+                    <p class="mb-0">{{ tr("Monitored bins") }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
             <div class="card text-white bg-danger">
                 <div class="card-body text-center">
                     <h5>{{ tr("Urgent") }}</h5>
-                    <h2>{{ bins|selectattr('status', 'equalto', 'Urgent')|list|length }}</h2>
-                    <p class="mb-0">{{ tr("Bins needing immediate attention") }}</p>
+                    <h2 id="urgentCount">0</h2>
+                    <p class="mb-0">{{ tr("Need attention") }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card text-white bg-warning">
                 <div class="card-body text-center">
                     <h5>{{ tr("Medium") }}</h5>
-                    <h2>{{ bins|selectattr('status', 'equalto', 'Medium')|list|length }}</h2>
-                    <p class="mb-0">{{ tr("Bins filling up") }}</p>
+                    <h2 id="mediumCount">0</h2>
+                    <p class="mb-0">{{ tr("Filling up") }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card text-white bg-success">
                 <div class="card-body text-center">
                     <h5>{{ tr("Good") }}</h5>
-                    <h2>{{ bins|selectattr('status', 'equalto', 'Enough Space')|list|length }}</h2>
-                    <p class="mb-0">{{ tr("Bins with enough space") }}</p>
+                    <h2 id="goodCount">0</h2>
+                    <p class="mb-0">{{ tr("Enough space") }}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bin Status Table -->
+    <!-- Bin Table -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-trash-alt"></i> {{ tr("Bin Status Overview") }}</h5>
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trash-alt"></i>
+                        {{ tr("Regional Bin Status") }} - {{ current_user.location }}
+                    </h5>
                 </div>
 
                 <div class="card-body">
                     {% if bins %}
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
+                        <table class="table table-hover" id="binsTable">
+                            <thead class="table-light">
                                 <tr>
                                     <th>{{ tr("Bin Code") }}</th>
                                     <th>{{ tr("Location") }}</th>
-                                    <th>{{ tr("Recyclable (g)") }}</th>
-                                    <th>{{ tr("Non-Recyclable (g)") }}</th>
-                                    <th>{{ tr("Total (g)") }}</th>
+                                    <th>{{ tr("Recyclable (kg)") }}</th>
+                                    <th>{{ tr("Non-Recyclable (kg)") }}</th>
                                     <th>{{ tr("Fill %") }}</th>
                                     <th>{{ tr("Last Cleaned") }}</th>
                                     <th>{{ tr("Status") }}</th>
+                                    <th>{{ tr("Last Update") }}</th>
                                 </tr>
                             </thead>
 
-                            <tbody>
-                                {% for bin in bins|sort(attribute='status', reverse=true) %}
-                                {% set total_weight = (bin.recyclable_weight or 0) + (bin.non_recyclable_weight or 0) %}
-                                <tr>
+                            <tbody id="binsTableBody">
+                                {% for bin in bins %}
+                                <tr class="bin-row" data-bin-code="{{ bin.bin_code }}">
                                     <td><strong>{{ bin.bin_code }}</strong></td>
                                     <td>{{ bin.location }}</td>
 
-                                    <!-- Recyclable Weight -->
-                                    <td>{{ "%.1f"|format(bin.recyclable_weight or 0) }}</td>
+                                    <td class="recyclable-weight">{{ "%.3f"|format((bin.recyclable_weight or 0) / 1000) }}</td>
+                                    <td class="nonrecyclable-weight">{{ "%.3f"|format((bin.non_recyclable_weight or 0) / 1000) }}</td>
 
-                                    <!-- Non-Recyclable Weight -->
-                                    <td>{{ "%.1f"|format(bin.non_recyclable_weight or 0) }}</td>
-
-                                    <!-- Total -->
-                                    <td><strong>{{ "%.1f"|format(total_weight) }}</strong></td>
-
-                                    <!-- Fill Percentage -->
                                     <td>
                                         <div class="progress" style="height: 20px;">
-                                            <div class="progress-bar 
+                                            <div class="progress-bar fill-percentage
                                                 {% if bin.status == 'Urgent' %}bg-danger
                                                 {% elif bin.status == 'Medium' %}bg-warning
                                                 {% else %}bg-success{% endif %}"
                                                 style="width: {{ bin.get_fill_percentage() }}%">
-                                                {{ "%.1f"|format(bin.get_fill_percentage()) }}%
+                                                <span class="fill-text">{{ "%.0f"|format(bin.get_fill_percentage()) }}%</span>
                                             </div>
                                         </div>
                                     </td>
 
-                                    <!-- Last Cleaned -->
-                                    <td>
-                                        {{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else tr("Never") }}
-                                    </td>
+                                    <td>{{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else tr("Never") }}</td>
 
-                                    <!-- Status -->
                                     <td>
-                                        <span class="badge 
+                                        <span class="badge bin-status 
                                             {% if bin.status == 'Urgent' %}bg-danger
                                             {% elif bin.status == 'Medium' %}bg-warning
                                             {% else %}bg-success{% endif %}">
-                                            {{ tr(bin.status) }}
+                                            {{ bin.status }}
                                         </span>
                                     </td>
+
+                                    <td class="last-update-time text-muted" style="font-size: 12px;">-</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
+
                         </table>
                     </div>
                     {% else %}
-                    <p class="text-muted text-center">{{ tr("No bins assigned to your location.") }}</p>
+                    <p class="text-muted text-center">{{ tr("No bins found in your region.") }}</p>
                     {% endif %}
                 </div>
             </div>
@@ -132,4 +143,77 @@
     </div>
 
 </div>
+
+<!-- Live Updating Script -->
+<script>
+const REFRESH_INTERVAL = 3000;
+const BACKEND_URL = "{{ url_for('index', _external=True).rstrip('/') }}";
+
+function getStatusColor(status) {
+    if (status === "Urgent") return "bg-danger";
+    if (status === "Medium") return "bg-warning";
+    return "bg-success";
+}
+
+async function updateAllBins() {
+    const rows = document.querySelectorAll(".bin-row");
+
+    for (const row of rows) {
+        const binCode = row.dataset.binCode;
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/get_bin_weight/${binCode}`);
+            const data = await response.json();
+
+            if (!data.success) continue;
+
+            const r = parseFloat(data.recyclable_weight || 0);
+            const nr = parseFloat(data.non_recyclable_weight || 0);
+            const cap = parseFloat(data.capacity || 1);
+
+            row.querySelector(".recyclable-weight").textContent = (r / 1000).toFixed(3);
+            row.querySelector(".nonrecyclable-weight").textContent = (nr / 1000).toFixed(3);
+
+            const fill = ((r + nr) / cap) * 100;
+            const fillBar = row.querySelector(".fill-percentage");
+
+            fillBar.style.width = fill + "%";
+            fillBar.textContent = Math.round(fill) + "%";
+            fillBar.className = "progress-bar fill-percentage " + getStatusColor(data.status);
+
+            const statusTag = row.querySelector(".bin-status");
+            statusTag.textContent = data.status;
+            statusTag.className = "badge bin-status " + getStatusColor(data.status);
+
+            row.querySelector(".last-update-time").textContent =
+                new Date().toLocaleTimeString();
+
+        } catch (err) {}
+    }
+
+    updateCounters();
+}
+
+function updateCounters() {
+    let urgent = 0, medium = 0, good = 0;
+
+    document.querySelectorAll('.bin-status').forEach(el => {
+        const status = el.textContent.trim();
+
+        if (status === "Urgent") urgent++;
+        else if (status === "Medium") medium++;
+        else if (status === "Enough Space" || status === "Good") good++;
+    });
+
+    document.getElementById('urgentCount').textContent = urgent;
+    document.getElementById('mediumCount').textContent = medium;
+    document.getElementById('goodCount').textContent = good;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateAllBins();
+    setInterval(updateAllBins, REFRESH_INTERVAL);
+});
+</script>
+
 {% endblock %}

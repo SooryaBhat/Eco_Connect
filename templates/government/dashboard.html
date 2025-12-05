@@ -123,7 +123,7 @@
                                             {% if bin.status == 'Urgent' %}bg-danger
                                             {% elif bin.status == 'Medium' %}bg-warning
                                             {% else %}bg-success{% endif %}">
-                                            {{ tr(bin.status) }}
+                                            {{ bin.status }}
                                         </span>
                                     </td>
 
@@ -151,7 +151,23 @@ const BACKEND_URL = "{{ url_for('index', _external=True).rstrip('/') }}";
 function getStatusColor(status) {
     if (status === "Urgent") return "bg-danger";
     if (status === "Medium") return "bg-warning";
-    return "bg-success";
+    return "bg-success";  // Enough Space
+}
+
+function updateCounters() {
+    let urgent = 0, medium = 0, good = 0;
+
+    document.querySelectorAll(".bin-status").forEach(tag => {
+        const status = tag.textContent.trim();
+
+        if (status === "Urgent") urgent++;
+        else if (status === "Medium") medium++;
+        else if (status === "Enough Space") good++;
+    });
+
+    document.getElementById("urgentCount").textContent = urgent;
+    document.getElementById("mediumCount").textContent = medium;
+    document.getElementById("goodCount").textContent = good;
 }
 
 async function updateAllBins() {
@@ -170,29 +186,30 @@ async function updateAllBins() {
             const nr = parseFloat(data.non_recyclable_weight || 0);
             const cap = parseFloat(data.capacity || 1);
 
-            // Convert grams → kilograms
             row.querySelector(".recyclable-weight").textContent = (r / 1000).toFixed(3);
             row.querySelector(".nonrecyclable-weight").textContent = (nr / 1000).toFixed(3);
 
             const fill = ((r + nr) / cap) * 100;
-            const fillBar = row.querySelector(".fill-percentage");
+            const bar = row.querySelector(".fill-percentage");
 
-            fillBar.style.width = fill + "%";
-            fillBar.textContent = Math.round(fill) + "%";
-            fillBar.className = "progress-bar fill-percentage " + getStatusColor(data.status);
+            bar.style.width = fill + "%";
+            bar.textContent = Math.round(fill) + "%";
+            bar.className = "progress-bar fill-percentage " + getStatusColor(data.status);
 
             const statusTag = row.querySelector(".bin-status");
             statusTag.textContent = data.status;
             statusTag.className = "badge bin-status " + getStatusColor(data.status);
 
-            row.querySelector(".last-update-time").textContent =
-                new Date().toLocaleTimeString();
+            row.querySelector(".last-update-time").textContent = new Date().toLocaleTimeString();
 
         } catch (err) {}
     }
+
+    updateCounters();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    updateCounters();
     setInterval(updateAllBins, REFRESH_INTERVAL);
 });
 </script>
