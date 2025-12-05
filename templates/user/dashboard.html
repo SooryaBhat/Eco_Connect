@@ -117,17 +117,18 @@ function scanBin() {
     fetch(`/api/bin/${binCode}`)
         .then(response => response.json())
         .then(data => {
-            if (data.error) {
-                // Show message if bin does not exist
+
+            // ❌ If API returns error
+            if (!data.success) {
                 resultBox.style.display = "block";
                 resultBox.innerHTML = `
                     <div class="alert alert-danger text-center">
-                        ${data.error}
+                        ${data.message || "Bin not found"}
                     </div>`;
                 return;
             }
 
-            // Show modal result section
+            // ✅ If API returns valid bin
             document.getElementById("binCodeDisplay").textContent = data.bin_code;
             document.getElementById("binLocation").textContent = data.location;
             document.getElementById("recyclableWeight").textContent = data.recyclable_weight + " kg";
@@ -136,16 +137,19 @@ function scanBin() {
             document.getElementById("binStatus").textContent = data.status;
 
             // Fill %
-            document.getElementById("fillProgress").style.width = data.fill_percentage + "%";
-            document.getElementById("fillProgress").textContent = Math.round(data.fill_percentage) + "%";
+            let progress = document.getElementById("fillProgress");
+            progress.style.width = data.fill_percentage + "%";
+            progress.textContent = Math.round(data.fill_percentage) + "%";
 
+            // Show card
             resultBox.style.display = "block";
         })
         .catch(err => {
             console.log(err);
-            alert("Error connecting to server");
+            alert("⚠ Error connecting to server.");
         });
 }
 </script>
 {% endblock %}
+
 <div class="modal fade" id="scanModal" tabindex="-1">
