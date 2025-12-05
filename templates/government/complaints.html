@@ -13,39 +13,46 @@
 
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> {{ tr("Regional Complaint Details") }}</h5>
+            <h5 class="mb-0">
+                <i class="fas fa-exclamation-triangle"></i>
+                {{ tr("Regional Complaint Details") }}
+            </h5>
         </div>
 
         <div class="card-body">
 
             {% if complaints %}
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>{{ tr("Title") }}</th>
-                        <th>{{ tr("User") }}</th>
-                        <th>{{ tr("Location") }}</th>
-                        <th>{{ tr("Description") }}</th>
-                        <th>{{ tr("Status") }}</th>
-                        <th>{{ tr("Date") }}</th>
-                    </tr>
-                </thead>
 
-                <tbody>
-                    {% for c in complaints %}
-                    <tr>
-                        <td>{{ c.id }}</td>
-                        <td>{{ c.title }}</td>
-                        <td>{{ c.user.username }}</td>
-                        <td>{{ c.location }}</td>
-                        <td>{{ c.description[:50] }}...</td>
-                        <td>{{ tr(c.status) }}</td>
-                        <td>{{ c.created_at.strftime('%Y-%m-%d') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <!-- 📌 FIXED: Table now responsive -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>{{ tr("Title") }}</th>
+                            <th>{{ tr("User") }}</th>
+                            <th>{{ tr("Location") }}</th>
+                            <th>{{ tr("Description") }}</th>
+                            <th>{{ tr("Status") }}</th>
+                            <th>{{ tr("Date") }}</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for c in complaints %}
+                        <tr>
+                            <td>{{ c.id }}</td>
+                            <td>{{ c.title }}</td>
+                            <td>{{ c.user.username }}</td>
+                            <td>{{ c.location }}</td>
+                            <td>{{ c.description[:50] }}...</td>
+                            <td>{{ tr(c.status) }}</td>
+                            <td>{{ c.created_at.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
             {% else %}
             <p class="text-muted text-center">{{ tr("No complaints in your region.") }}</p>
