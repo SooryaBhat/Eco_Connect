@@ -29,6 +29,18 @@
         z-index: 1000 !important;
     }
   </style>
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+      // REMOVE ALL OFFCANVAS BACKDROPS FOR DESKTOP
+      const hideBackdrop = () => {
+          document.querySelectorAll(".offcanvas-backdrop")
+              .forEach(b => b.remove());
+      };
+
+      hideBackdrop();
+      setInterval(hideBackdrop, 200); // keep cleaning backdrop
+  });
+  </script>
 
 </head>
 <body>
