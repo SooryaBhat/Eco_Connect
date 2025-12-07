@@ -22,6 +22,7 @@ body {
 .navbar {
   background-color: var(--accent-dark) !important;
   height: var(--navbar-height);
+  z-index: 1030 !important; /* FIXED: modal should be above navbar */
 }
 .navbar-brand, .navbar-text { color: #fff !important; }
 
@@ -54,7 +55,9 @@ body {
         height: calc(100vh - var(--navbar-height));
         background-color: var(--accent);
         transition: left 0.3s ease;
-        z-index: 1040;
+
+        /* FIXED: Sidebar MUST be below modal */
+        z-index: 1020 !important;
     }
 
     /* When toggled open */
@@ -122,7 +125,10 @@ body {
   justify-content: space-around;
   align-items: center;
   padding: 6px 0;
-  z-index: 1050;
+
+  /* FIXED: bottom nav should NOT block modal */
+  z-index: 1000 !important;
+
   height: 60px;
 }
 .bottom-nav a { color: var(--accent); text-decoration: none; font-size: 12px; display:block; }
@@ -156,17 +162,21 @@ body {
   .progress-bar { font-size: 0.9rem; }
 }
 
-/* Fix Bootstrap modal freezing on desktop */
+/* ------------------------
+   FINAL MODAL FIX (THE IMPORTANT PART)
+------------------------ */
+
+/* Backdrop should be below modal but above page */
 .modal-backdrop.show {
     z-index: 1040 !important;
 }
 
+/* Modal must be highest */
 .modal {
-    z-index: 1050 !important;
-    position: relative !important;
+    z-index: 200000 !important;
 }
 
+/* Center the modal properly */
 .modal-dialog {
-    margin-top: 80px !important;
-    z-index: 1051 !important;
+    margin: 10vh auto !important;
 }
