@@ -1,154 +1,219 @@
-{% extends "base.html" %} .....correct this code that i want to fetch the details of the bin when i search that bin and i select search option then it automatically screen will not responding 
+{% extends "base.html" %}
 
-{% block title %}{{ tr("User Dashboard") }}{% endblock %}
+{% block title %}{{ tr("Government Dashboard") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
 
+    <!-- Header Card -->
     <div class="row">
         <div class="col-12">
-            <div class="card bg-success text-white mb-4">
+            <div class="card bg-primary text-white mb-4">
                 <div class="card-body text-center">
-                    <h3><i class="fas fa-user-circle"></i> {{ tr("Welcome") }}, {{ current_user.username }}!</h3>
-                    <p class="mb-0">{{ tr("Location:") }} {{ current_user.location }}</p>
+                    <h3>
+                        <i class="fas fa-landmark"></i>
+                        {{ tr("Welcome") }}, {{ current_user.username }}!
+                    </h3>
+                    <p class="mb-0">{{ tr("Government Official") }} - {{ current_user.location }}</p>
+                    <small class="mt-2">
+                        <i class="fas fa-sync-alt" id="syncIcon"></i>
+                        {{ tr("Last Update") }}: <span id="lastUpdate">Just now</span>
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scan QR -->
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body text-center">
+                    <h5>{{ tr("Total Bins") }}</h5>
+                    <h2 id="totalBins">{{ bins|length }}</h2>
+                    <p class="mb-0">{{ tr("Monitored bins") }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body text-center">
+                    <h5>{{ tr("Urgent") }}</h5>
+                    <h2 id="urgentCount">0</h2>
+                    <p class="mb-0">{{ tr("Need attention") }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body text-center">
+                    <h5>{{ tr("Medium") }}</h5>
+                    <h2 id="mediumCount">0</h2>
+                    <p class="mb-0">{{ tr("Filling up") }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <h5>{{ tr("Good") }}</h5>
+                    <h2 id="goodCount">0</h2>
+                    <p class="mb-0">{{ tr("Enough space") }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bin Table -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
-
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-qrcode"></i> {{ tr("Scan Bin QR Code") }}</h5>
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trash-alt"></i>
+                        {{ tr("Regional Bin Status") }} - {{ current_user.location }}
+                    </h5>
                 </div>
 
-                <div class="card-body text-center">
-                    <p class="text-muted">{{ tr("Scan a bin QR code to view its status") }}</p>
+                <div class="card-body">
+                    {% if bins %}
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="binsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{{ tr("Bin Code") }}</th>
+                                    <th>{{ tr("Location") }}</th>
+                                    <th>{{ tr("Recyclable (kg)") }}</th>
+                                    <th>{{ tr("Non-Recyclable (kg)") }}</th>
+                                    <th>{{ tr("Fill %") }}</th>
+                                    <th>{{ tr("Last Cleaned") }}</th>
+                                    <th>{{ tr("Status") }}</th>
+                                    <th>{{ tr("Last Update") }}</th>
+                                </tr>
+                            </thead>
 
-                    <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#scanModal">
-                        <i class="fas fa-camera"></i> {{ tr("Scan the Bin") }}
-                    </button>
-                </div>
+                            <tbody id="binsTableBody">
+                                {% for bin in bins %}
+                                <tr class="bin-row" data-bin-code="{{ bin.bin_code }}">
+                                    <td><strong>{{ bin.bin_code }}</strong></td>
+                                    <td>{{ bin.location }}</td>
 
-            </div>
-        </div>
-    </div>
-</div>
+                                    <td class="recyclable-weight">{{ "%.3f"|format((bin.recyclable_weight or 0) / 1000) }}</td>
+                                    <td class="nonrecyclable-weight">{{ "%.3f"|format((bin.non_recyclable_weight or 0) / 1000) }}</td>
 
-<!-- Modal -->
-<div class="modal fade" id="scanModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar fill-percentage
+                                                {% if bin.status == 'Urgent' %}bg-danger
+                                                {% elif bin.status == 'Medium' %}bg-warning
+                                                {% else %}bg-success{% endif %}"
+                                                style="width: {{ bin.get_fill_percentage() }}%">
+                                                <span class="fill-text">{{ "%.0f"|format(bin.get_fill_percentage()) }}%</span>
+                                            </div>
+                                        </div>
+                                    </td>
 
-            <div class="modal-header">
-                <h5 class="modal-title">{{ tr("Scan Bin QR Code") }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+                                    <td>{{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else tr("Never") }}</td>
 
-            <div class="modal-body">
+                                    <td>
+                                        <span class="badge bin-status 
+                                            {% if bin.status == 'Urgent' %}bg-danger
+                                            {% elif bin.status == 'Medium' %}bg-warning
+                                            {% else %}bg-success{% endif %}">
+                                            {{ bin.status }}
+                                        </span>
+                                    </td>
 
-                <label class="form-label">{{ tr("Enter Bin Code (Demo") }}</label>
-                <input type="text" id="binCode" class="form-control" placeholder="BIN001">
+                                    <td class="last-update-time text-muted" style="font-size: 12px;">-</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
 
-                <small class="text-muted">{{ tr("Try:") }} BIN001, BIN002, BIN003</small>
-
-                <button class="btn btn-success w-100 mt-3" onclick="scanBin()">
-                    <i class="fas fa-search"></i> {{ tr("Fetch Bin Status") }}
-                </button>
-
-                <!-- Result -->
-                <div id="binResult" class="mt-4" style="display:none;">
-                    <div class="card">
-
-                        <div class="card-header bg-success text-white">
-                            <h6>{{ tr("Bin Details") }}</h6>
-                        </div>
-
-                        <div class="card-body">
-
-                            <strong>Bin Code:</strong>
-                            <p id="binCodeDisplay"></p>
-
-                            <strong>{{ tr("Location:") }}</strong>
-                            <p id="binLocation"></p>
-
-                            <strong>{{ tr("Recyclable Weight:") }}</strong>
-                            <p id="recyclableWeight"></p>
-
-                            <strong>{{ tr("Non-Recyclable Weight:") }}</strong>
-                            <p id="nonRecyclableWeight"></p>
-
-                            <strong>{{ tr("Fill Percentage:") }}</strong>
-                            <div class="progress" style="height:25px;">
-                                <div id="fillProgress" class="progress-bar"></div>
-                            </div>
-
-                            <strong>{{ tr("Last Cleaned:") }}</strong>
-                            <p id="lastCleaned"></p>
-
-                            <strong>{{ tr("Status") }}:</strong>
-                            <p id="binStatus"></p>
-
-                        </div>
-
+                        </table>
                     </div>
+                    {% else %}
+                    <p class="text-muted text-center">{{ tr("No bins found in your region.") }}</p>
+                    {% endif %}
                 </div>
-
             </div>
-
         </div>
     </div>
+
 </div>
-{% endblock %}
-{% block extra_js %}
+
+<!-- Live Updating Script -->
 <script>
-function scanBin() {
+const REFRESH_INTERVAL = 3000;
+const BACKEND_URL = "{{ url_for('index', _external=True).rstrip('/') }}";
 
-    let binCode = document.getElementById("binCode").value.trim();
-    let resultBox = document.getElementById("binResult");
+function getStatusColor(status) {
+    if (status === "Urgent") return "bg-danger";
+    if (status === "Medium") return "bg-warning";
+    return "bg-success";
+}
 
-    if (!binCode) {
-        alert("Please enter a Bin Code.");
-        return;
+async function updateAllBins() {
+    const rows = document.querySelectorAll(".bin-row");
+
+    for (const row of rows) {
+        const binCode = row.dataset.binCode;
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/get_bin_weight/${binCode}`);
+            const data = await response.json();
+
+            if (!data.success) continue;
+
+            const r = parseFloat(data.recyclable_weight || 0);
+            const nr = parseFloat(data.non_recyclable_weight || 0);
+            const cap = parseFloat(data.capacity || 1);
+
+            row.querySelector(".recyclable-weight").textContent = (r / 1000).toFixed(3);
+            row.querySelector(".nonrecyclable-weight").textContent = (nr / 1000).toFixed(3);
+
+            const fill = ((r + nr) / cap) * 100;
+            const fillBar = row.querySelector(".fill-percentage");
+
+            fillBar.style.width = fill + "%";
+            fillBar.textContent = Math.round(fill) + "%";
+            fillBar.className = "progress-bar fill-percentage " + getStatusColor(data.status);
+
+            const statusTag = row.querySelector(".bin-status");
+            statusTag.textContent = data.status;
+            statusTag.className = "badge bin-status " + getStatusColor(data.status);
+
+            row.querySelector(".last-update-time").textContent =
+                new Date().toLocaleTimeString();
+
+        } catch (err) {}
     }
 
-    fetch(`/api/bin/${binCode}`)
-        .then(response => response.json())
-        .then(data => {
-
-            // ❌ If backend returns: { "error": "Bin not found" }
-            if (data.error) {
-                resultBox.style.display = "block";
-                resultBox.innerHTML = `
-                    <div class="alert alert-danger text-center">
-                        ${data.error}
-                    </div>`;
-                return;
-            }
-
-            // ✅ Show results from your API format
-            document.getElementById("binCodeDisplay").textContent = data.bin_code;
-            document.getElementById("binLocation").textContent = data.location;
-            document.getElementById("recyclableWeight").textContent = data.recyclable_weight + " kg";
-            document.getElementById("nonRecyclableWeight").textContent = data.non_recyclable_weight + " kg";
-            document.getElementById("lastCleaned").textContent = data.last_cleaned;
-            document.getElementById("binStatus").textContent = data.status;
-
-            // Fill %
-            let fill = Math.round(data.fill_percentage);
-            let bar = document.getElementById("fillProgress");
-            bar.style.width = fill + "%";
-            bar.textContent = fill + "%";
-
-            resultBox.style.display = "block";
-        })
-        .catch(err => {
-            console.error(err);
-            alert("⚠ Error connecting to server.");
-        });
+    updateCounters();
 }
+
+function updateCounters() {
+    let urgent = 0, medium = 0, good = 0;
+
+    document.querySelectorAll('.bin-status').forEach(el => {
+        const status = el.textContent.trim();
+
+        if (status === "Urgent") urgent++;
+        else if (status === "Medium") medium++;
+        else if (status === "Enough Space" || status === "Good") good++;
+    });
+
+    document.getElementById('urgentCount').textContent = urgent;
+    document.getElementById('mediumCount').textContent = medium;
+    document.getElementById('goodCount').textContent = good;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateAllBins();
+    setInterval(updateAllBins, REFRESH_INTERVAL);
+});
 </script>
+
 {% endblock %}
