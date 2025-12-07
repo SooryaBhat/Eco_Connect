@@ -245,22 +245,36 @@ def user_dashboard():
     return render_template('user/dashboard.html')
 
 
-@app.route('/api/bin/<bin_code>')
-def api_get_bin(bin_code):
-    bin = Bins.query.filter_by(bin_code=bin_code).first()
+@app.route('/user/scan_bin', methods=['POST'])
+@login_required
+@role_required('User')
+def scan_bin():
+    bin_code = request.json.get('bin_code')
+    bin_data = db_session.query(Bin).filter_by(bin_code=bin_code).first()
 
-    if not bin:
-        return jsonify({"error": "Bin not found"}), 404
-
-    return jsonify({
-        "bin_code": bin.bin_code,
-        "location": bin.location,
-        "recyclable_weight": bin.recyclable_weight,
-        "non_recyclable_weight": bin.non_recyclable_weight,
-        "fill_percentage": bin.get_fill_percentage(),
-        "last_cleaned": bin.last_cleaned.strftime("%Y-%m-%d") if bin.last_cleaned else "Never",
-        "status": bin.status
-    })
+    if bin_data:
+        return jsonify({
+            'success': True,
+            'bin': {
+                'code':
+                bin_data.bin_code,
+                'location':
+                bin_data.location,
+                'recyclable_weight':
+                bin_data.recyclable_weight,
+                'non_recyclable_weight':
+                bin_data.non_recyclable_weight,
+                'fill_percentage':
+                round(bin_data.get_fill_percentage(), 2),
+                'last_cleaned':
+                bin_data.last_cleaned.strftime('%Y-%m-%d')
+                if bin_data.last_cleaned else 'Never',
+                'status':
+                bin_data.status
+            }
+        })
+    else:
+        return jsonify({'success': False, 'message': 'Bin not found'})
 
 
 @app.route('/user/complaint', methods=['GET', 'POST'])
@@ -588,6 +602,8 @@ def set_language(lang):
     if lang in ("en", "kn", "tulu"):
         session["lang"] = lang
     return redirect(request.referrer or url_for("index"))
+
+
 
 
 
