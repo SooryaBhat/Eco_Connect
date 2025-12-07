@@ -156,22 +156,17 @@ body {
   .progress-bar { font-size: 0.9rem; }
 }
 
-.modal {
-  z-index: 2000 !important;
+/* Fix Bootstrap modal freezing on desktop */
+.modal-backdrop.show {
+    z-index: 1040 !important;
 }
 
-.modal-backdrop {
-  z-index: 1500 !important;
+.modal {
+    z-index: 1050 !important;
+    position: relative !important;
 }
+
 .modal-dialog {
     margin-top: 80px !important;
-}
-
-/* Fix modal not clickable / going behind elements */
-.modal-backdrop {
-    z-index: 2000 !important;
-}
-
-.modal {
-    z-index: 3000 !important;
+    z-index: 1051 !important;
 }
