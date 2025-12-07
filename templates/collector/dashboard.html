@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ tr("Government Dashboard") }}{% endblock %}
+{% block title %}{{ tr("Collector Dashboard") }}{% endblock %}
 
 {% block content %}
 <div class="container my-4">
@@ -14,7 +14,7 @@
                         <i class="fas fa-landmark"></i>
                         {{ tr("Welcome") }}, {{ current_user.username }}!
                     </h3>
-                    <p class="mb-0">{{ tr("Government Official") }} - {{ current_user.location }}</p>
+                    <p class="mb-0">{{ tr("Collector Hero") }} - {{ current_user.location }}</p>
                     <small class="mt-2">
                         <i class="fas fa-sync-alt" id="syncIcon"></i>
                         {{ tr("Last Update") }}: <span id="lastUpdate">Just now</span>
