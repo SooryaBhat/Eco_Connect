@@ -250,7 +250,7 @@ def user_dashboard():
 @role_required('User')
 def api_get_bin(bin_code):
 
-    bin = Bin.query.filter_by(bin_code=bin_code).first()
+    bin = db_session.query(Bin).filter_by(bin_code=bin_code).first()
 
     if not bin:
         return jsonify({"error": "Bin not found"}), 404
@@ -264,6 +264,7 @@ def api_get_bin(bin_code):
         "last_cleaned": bin.last_cleaned.strftime("%Y-%m-%d") if bin.last_cleaned else "Never",
         "status": bin.status
     })
+
 
 
 
