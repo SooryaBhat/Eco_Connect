@@ -92,6 +92,7 @@
                                     <th>{{ tr("Last Cleaned") }}</th>
                                     <th>{{ tr("Status") }}</th>
                                     <th>{{ tr("Last Update") }}</th>
+                                    <th>Prediction</th> <!-- ✅ ADDED -->
                                 </tr>
                             </thead>
 
@@ -128,6 +129,14 @@
                                     </td>
 
                                     <td class="last-update-time text-muted" style="font-size: 12px;">-</td>
+
+                                    <!-- ✅ ADDED BUTTON -->
+                                    <td>
+                                        <button onclick="predictBin(this)" class="btn btn-sm btn-primary">
+                                            Predict
+                                        </button>
+                                    </td>
+
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -210,9 +219,117 @@ function updateCounters() {
     document.getElementById('goodCount').textContent = good;
 }
 
+
+// 🔥 UPDATED ML FUNCTION (NO ALERT, SHOW IN TABLE)
+        async function predictBin(button) {
+
+            const row = button.closest("tr");
+
+            const fillText = row.querySelector(".fill-text").textContent;
+            const currentFill = parseFloat(fillText);
+
+            const hoursSinceCleaned = 12;
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        Current_Fill: currentFill,
+                        Hours_Since_Cleaned: hoursSinceCleaned,
+                        Location_Bantwala: 0,
+                        Location_Puttur: 0,
+                        Location_Sulya: 0,
+                        Day_Saturday: 0,
+                        Day_Sunday: 0,
+                        Time_Evening: 1,
+                        Time_Morning: 0
+                    })
+                });
+
+                const data = await response.json();
+                const prediction = data.predicted_fill;
+
+                // 🔥 Calculate growth rate
+                const growthRate = (prediction - currentFill) / hoursSinceCleaned;
+
+                let timeToFull = "Stable";
+
+                if (growthRate > 0) {
+                    const remaining = 100 - prediction;
+                    const hours = remaining / growthRate;
+
+                    if (hours < 1) {
+                        timeToFull = "Less than 1 hr";
+                    } else if (hours < 24) {
+                        timeToFull = `${Math.round(hours)} hrs`;
+                    } else {
+                        timeToFull = `${Math.round(hours / 24)} days`;
+                    }
+                }
+
+                // 🔥 Status coloring
+                let color = "green";
+                let text = "Safe";
+
+                if (prediction >= 90) {
+                    color = "red";
+                    text = "Overflow Soon";
+                } else if (prediction >= 70) {
+                    color = "orange";
+                    text = "Filling Fast";
+                }
+
+                // 🔥 FINAL DISPLAY
+                button.parentElement.innerHTML = `
+                    <div style="font-weight:bold; color:${color}">
+                        ${prediction.toFixed(1)}% (${text})
+                        <br>
+                        <small>⏱ ${timeToFull}</small>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // 🔥 Update table cell
+        button.parentElement.innerHTML = `
+            <span style="color:${color}; font-weight:bold">
+                ${prediction.toFixed(1)}% (${text})
+            </span>
+        `;
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+// 🔥 AUTO PREDICT ALL BINS
+async function autoPredictAllBins() {
+    const buttons = document.querySelectorAll("button");
+
+    buttons.forEach(btn => {
+        if (btn.innerText === "Predict") {
+            predictBin(btn);
+        }
+    });
+}
+
+
+// 🔥 FINAL LOAD LOGIC
 document.addEventListener("DOMContentLoaded", () => {
     updateAllBins();
-    setInterval(updateAllBins, REFRESH_INTERVAL);
+    autoPredictAllBins();
+
+    setInterval(() => {
+        updateAllBins();
+        autoPredictAllBins();
+    }, REFRESH_INTERVAL);
 });
 </script>
 
