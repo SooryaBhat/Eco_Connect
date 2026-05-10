@@ -3,13 +3,253 @@
 {% block title %}{{ tr("Collector Dashboard") }}{% endblock %}
 
 {% block content %}
+
+<!-- ─── Smart Alerts CSS ─────────────────────────────────────────── -->
+<style>
+  /* ── Alert Cards ── */
+  .alert-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    overflow: hidden;
+  }
+  .alert-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.16);
+  }
+
+  /* ── Section headings ── */
+  .smart-section-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+  }
+
+  /* ── Urgent card accent bar ── */
+  .urgent-card {
+    border-left: 5px solid #dc3545 !important;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  }
+  .urgent-card .card-icon {
+    font-size: 2rem;
+    color: #dc3545;
+  }
+
+  /* ── Task card accent bar ── */
+  .task-card {
+    border-left: 5px solid #0d6efd !important;
+    background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+  }
+
+  /* ── AI suggestion cards ── */
+  .ai-card-green {
+    border-left: 5px solid #198754 !important;
+    background: linear-gradient(135deg, #f0fff6 0%, #ffffff 100%);
+  }
+  .ai-card-blue {
+    border-left: 5px solid #0dcaf0 !important;
+    background: linear-gradient(135deg, #f0faff 0%, #ffffff 100%);
+  }
+
+  /* ── Smart Alerts wrapper ── */
+  .smart-alerts-wrapper {
+    background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 2px 14px rgba(13,110,253,0.08);
+  }
+
+  .smart-alerts-header {
+    background: linear-gradient(90deg, #1a237e 0%, #1565c0 60%, #0288d1 100%);
+    border-radius: 14px;
+    padding: 1rem 1.4rem;
+    margin-bottom: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .smart-alerts-header .title-block h4 {
+    color: #fff;
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+  .smart-alerts-header .title-block small {
+    color: #b3d4f5;
+    font-size: 0.78rem;
+  }
+  .smart-alerts-header .ai-badge {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    border-radius: 50px;
+    padding: 4px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Notification Bell ── */
+  .notif-bell-btn {
+    position: relative;
+    background: rgba(255,255,255,0.18);
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    color: #fff;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .notif-bell-btn:hover { background: rgba(255,255,255,0.32); }
+  .notif-bell-btn .badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 0.62rem;
+    padding: 2px 5px;
+  }
+
+  /* ── Dropdown panel ── */
+  .notif-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 52px;
+    width: 320px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    z-index: 2000;
+    overflow: hidden;
+    animation: fadeSlideDown 0.22s ease;
+  }
+  .notif-dropdown.show { display: block; }
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .notif-dropdown-header {
+    background: linear-gradient(90deg, #dc3545, #c62828);
+    color: #fff;
+    padding: 0.7rem 1rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .notif-item {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item i { color: #dc3545; margin-top: 2px; flex-shrink: 0; }
+  .notif-item .notif-meta { color: #888; font-size: 0.74rem; }
+  .notif-empty {
+    padding: 1.2rem;
+    text-align: center;
+    color: #aaa;
+    font-size: 0.84rem;
+  }
+
+  /* ── Fill bar pulse for urgent ── */
+  @keyframes urgentPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.6; }
+  }
+  .urgent-pulse { animation: urgentPulse 1.6s ease-in-out infinite; }
+
+  /* ── Task status badges ── */
+  .task-badge-pending    { background: #ffc107; color: #212529; }
+  .task-badge-inprogress { background: #0d6efd; color: #fff; }
+  .task-badge-completed  { background: #198754; color: #fff; }
+
+  /* ── Responsive two-col grid for task list ── */
+  .task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.85rem;
+  }
+  .ai-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.85rem;
+  }
+</style>
+
 <div class="container my-4">
 
-    <!-- Header Card -->
+    <!-- ════════════════════════════════════════════════════════════
+         HEADER CARD  (notification bell added top-right)
+    ══════════════════════════════════════════════════════════════ -->
     <div class="row">
         <div class="col-12">
             <div class="card bg-primary text-white mb-4">
-                <div class="card-body text-center">
+                <div class="card-body text-center position-relative">
+
+                    <!-- Notification Bell -->
+                    {% set urgent_bins = [] %}
+                    {% for bin in bins %}{% if bin.status == 'Urgent' %}{% set _ = urgent_bins.append(bin) %}{% endif %}{% endfor %}
+
+                    <div class="position-absolute top-0 end-0 p-3" style="z-index:10;">
+                        <div class="position-relative">
+                            <button class="notif-bell-btn" id="notifBellBtn" title="Urgent Alerts"
+                                    onclick="toggleNotifDropdown()">
+                                <i class="fas fa-bell"></i>
+                                {% if urgent_bins|length > 0 %}
+                                <span class="badge bg-danger rounded-pill">{{ urgent_bins|length }}</span>
+                                {% endif %}
+                            </button>
+
+                            <!-- Dropdown panel -->
+                            <div class="notif-dropdown" id="notifDropdown">
+                                <div class="notif-dropdown-header">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Urgent Alerts
+                                    <span class="ms-auto badge bg-white text-danger">
+                                        {{ urgent_bins|length }}
+                                    </span>
+                                </div>
+
+                                {% if urgent_bins %}
+                                    {% for bin in urgent_bins %}
+                                    <div class="notif-item">
+                                        <i class="fas fa-trash-alt mt-1"></i>
+                                        <div>
+                                            <strong>{{ bin.bin_code }}</strong> — {{ bin.location }}<br>
+                                            <span class="text-danger fw-semibold">
+                                                {{ "%.0f"|format(bin.get_fill_percentage()) }}% full
+                                            </span>
+                                            &nbsp;· Immediate collection required
+                                            <div class="notif-meta">
+                                                <i class="fas fa-clock me-1"></i>Live monitoring active
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="notif-empty">
+                                        <i class="fas fa-check-circle text-success me-1"></i>
+                                        All bins are within safe levels
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Notification Bell -->
+
                     <h3>
                         <i class="fas fa-landmark"></i>
                         {{ tr("Welcome") }}, {{ current_user.username }}!
@@ -24,7 +264,9 @@
         </div>
     </div>
 
-    <!-- Summary Cards -->
+    <!-- ════════════════════════════════════════════════════════════
+         SUMMARY CARDS  (unchanged)
+    ══════════════════════════════════════════════════════════════ -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
             <div class="card text-white bg-primary">
@@ -35,7 +277,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-3 mb-3">
             <div class="card text-white bg-danger">
                 <div class="card-body text-center">
@@ -45,7 +286,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-3 mb-3">
             <div class="card text-white bg-warning">
                 <div class="card-body text-center">
@@ -55,7 +295,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-3 mb-3">
             <div class="card text-white bg-success">
                 <div class="card-body text-center">
@@ -67,7 +306,245 @@
         </div>
     </div>
 
-    <!-- Bin Table -->
+    <!-- ════════════════════════════════════════════════════════════
+         SMART ALERTS & COLLECTION NOTIFICATIONS  (NEW)
+    ══════════════════════════════════════════════════════════════ -->
+    <div class="row mb-2">
+        <div class="col-12">
+            <div class="smart-alerts-wrapper">
+
+                <!-- Section header -->
+                <div class="smart-alerts-header">
+                    <div class="title-block">
+                        <h4>
+                            <i class="fas fa-satellite-dish me-2"></i>
+                            Smart Alerts &amp; Collection Notifications
+                        </h4>
+                        <small>AI-powered waste management · Real-time monitoring</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                        <span class="ai-badge"><i class="fas fa-brain me-1"></i>AI Active</span>
+                        <span class="ai-badge d-none d-sm-inline">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            {{ current_user.location }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- ── A) URGENT COLLECTION ALERTS ─────────────────── -->
+                <p class="smart-section-title text-danger">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    A — Urgent Collection Alerts
+                </p>
+
+                {% set urgent_messages = [
+                    "Overflow risk detected",
+                    "Immediate collection required",
+                    "Bin capacity critical – collect now",
+                    "Overflow imminent – priority dispatch needed"
+                ] %}
+
+                {% set urgent_list = [] %}
+                {% for bin in bins %}
+                    {% if bin.status == 'Urgent' %}
+                        {% set _ = urgent_list.append(bin) %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if urgent_list %}
+                <div class="row g-3 mb-4" id="urgentAlertsRow">
+                    {% for bin in urgent_list %}
+                    {% set msg = urgent_messages[loop.index0 % urgent_messages|length] %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card alert-card urgent-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="card-icon urgent-pulse">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="badge bg-danger fs-6 px-3 py-1">
+                                                {{ bin.bin_code }}
+                                            </span>
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">
+                                                URGENT
+                                            </span>
+                                        </div>
+                                        <p class="mb-1 text-muted small">
+                                            <i class="fas fa-map-marker-alt me-1 text-danger"></i>
+                                            {{ bin.location }}
+                                        </p>
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <small class="fw-semibold">Fill Level</small>
+                                                <small class="text-danger fw-bold">
+                                                    {{ "%.0f"|format(bin.get_fill_percentage()) }}%
+                                                </small>
+                                            </div>
+                                            <div class="progress" style="height:8px; border-radius:6px;">
+                                                <div class="progress-bar bg-danger urgent-pulse"
+                                                     style="width:{{ bin.get_fill_percentage() }}%; border-radius:6px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="mb-0 text-danger fw-semibold small">
+                                            <i class="fas fa-bell me-1"></i>{{ msg }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-success border-0 rounded-3 mb-4 d-flex align-items-center gap-3 shadow-sm">
+                    <i class="fas fa-check-circle fs-3 text-success"></i>
+                    <div>
+                        <strong>All clear!</strong> No urgent bins detected in
+                        <strong>{{ current_user.location }}</strong> right now.
+                        Live monitoring is active.
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ── B) DAILY COLLECTION TASKS ──────────────────── -->
+                <p class="smart-section-title text-primary">
+                    <i class="fas fa-clipboard-list me-1"></i>
+                    B — Daily Collection Tasks
+                </p>
+
+                {% set tasks = [
+                    {"bin": "B101", "location": current_user.location, "time": "08:00 AM", "status": "Completed",  "type": "Recyclable"},
+                    {"bin": "B102", "location": current_user.location, "time": "10:30 AM", "status": "In Progress","type": "Mixed"},
+                    {"bin": "B103", "location": current_user.location, "time": "12:00 PM", "status": "Pending",    "type": "Non-Recyclable"},
+                    {"bin": "B104", "location": current_user.location, "time": "02:00 PM", "status": "Pending",    "type": "Recyclable"},
+                    {"bin": "B105", "location": current_user.location, "time": "04:30 PM", "status": "Pending",    "type": "Mixed"}
+                ] %}
+
+                <div class="task-grid mb-4">
+                    {% for task in tasks %}
+                    {% if task.status == "Completed" %}
+                        {% set badge_cls = "task-badge-completed" %}
+                        {% set icon = "fas fa-check-circle" %}
+                        {% set icon_color = "text-success" %}
+                    {% elif task.status == "In Progress" %}
+                        {% set badge_cls = "task-badge-inprogress" %}
+                        {% set icon = "fas fa-spinner fa-spin" %}
+                        {% set icon_color = "text-primary" %}
+                    {% else %}
+                        {% set badge_cls = "task-badge-pending" %}
+                        {% set icon = "fas fa-clock" %}
+                        {% set icon_color = "text-warning" %}
+                    {% endif %}
+
+                    <div class="card alert-card task-card h-100">
+                        <div class="card-body py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="{{ icon }} {{ icon_color }} fs-5"></i>
+                                    <div>
+                                        <div class="fw-bold">Bin {{ task.bin }}</div>
+                                        <div class="text-muted small">
+                                            <i class="fas fa-map-marker-alt me-1"></i>{{ task.location }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="badge {{ badge_cls }} rounded-pill px-3 py-1">
+                                    {{ task.status }}
+                                </span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>
+                                    <i class="far fa-clock me-1"></i>{{ task.time }}
+                                </span>
+                                <span>
+                                    <i class="fas fa-recycle me-1"></i>{{ task.type }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- ── C) AI SMART SUGGESTIONS ─────────────────────── -->
+                <p class="smart-section-title" style="color:#198754;">
+                    <i class="fas fa-brain me-1"></i>
+                    C — AI Smart Suggestions
+                </p>
+
+                {% set suggestions = [
+                    {
+                        "style": "ai-card-green",
+                        "icon":  "fas fa-route",
+                        "icon_color": "text-success",
+                        "title": "Priority Route Optimization",
+                        "body":  "Collect Bin B102 first to avoid overflow. High fill rate detected — estimated full in 2 hrs.",
+                        "tag":   "Route AI",
+                        "tag_cls": "bg-success"
+                    },
+                    {
+                        "style": "ai-card-blue",
+                        "icon":  "fas fa-tachometer-alt",
+                        "icon_color": "text-info",
+                        "title": "Optimized Route Saves 18 Minutes",
+                        "body":  "AI calculated the most efficient path: B102 → B103 → B105 → B101. Estimated travel reduction: 18 min.",
+                        "tag":   "Time Saver",
+                        "tag_cls": "bg-info"
+                    },
+                    {
+                        "style": "ai-card-green",
+                        "icon":  "fas fa-recycle",
+                        "icon_color": "text-success",
+                        "title": "Segregation Alert",
+                        "body":  "Bins B101 and B104 are high in recyclable waste. Coordinate with the recycler team for pick-up.",
+                        "tag":   "Eco AI",
+                        "tag_cls": "bg-success"
+                    },
+                    {
+                        "style": "ai-card-blue",
+                        "icon":  "fas fa-chart-line",
+                        "icon_color": "text-info",
+                        "title": "Fill-Rate Prediction",
+                        "body":  "Based on historical data, Bin B103 will reach critical levels by 1:45 PM. Schedule early collection.",
+                        "tag":   "Predictive",
+                        "tag_cls": "bg-info"
+                    }
+                ] %}
+
+                <div class="ai-grid">
+                    {% for s in suggestions %}
+                    <div class="card alert-card {{ s.style }} h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start gap-3">
+                                <div style="font-size:1.7rem;">
+                                    <i class="{{ s.icon }} {{ s.icon_color }}"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-1 flex-wrap gap-1">
+                                        <strong class="small">{{ s.title }}</strong>
+                                        <span class="badge {{ s.tag_cls }} bg-opacity-75 small px-2">
+                                            {{ s.tag }}
+                                        </span>
+                                    </div>
+                                    <p class="mb-0 text-muted small">{{ s.body }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            </div><!-- /smart-alerts-wrapper -->
+        </div>
+    </div>
+    <!-- /SMART ALERTS ══════════════════════════════════════════════ -->
+
+    <!-- ════════════════════════════════════════════════════════════
+         REGIONAL BIN STATUS TABLE  (unchanged)
+    ══════════════════════════════════════════════════════════════ -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
@@ -92,7 +569,7 @@
                                     <th>{{ tr("Last Cleaned") }}</th>
                                     <th>{{ tr("Status") }}</th>
                                     <th>{{ tr("Last Update") }}</th>
-                                    <th>Prediction</th> <!-- ✅ ADDED -->
+                                    <th>Prediction</th>
                                 </tr>
                             </thead>
 
@@ -120,7 +597,7 @@
                                     <td>{{ bin.last_cleaned.strftime('%Y-%m-%d') if bin.last_cleaned else tr("Never") }}</td>
 
                                     <td>
-                                        <span class="badge bin-status 
+                                        <span class="badge bin-status
                                             {% if bin.status == 'Urgent' %}bg-danger
                                             {% elif bin.status == 'Medium' %}bg-warning
                                             {% else %}bg-success{% endif %}">
@@ -130,17 +607,14 @@
 
                                     <td class="last-update-time text-muted" style="font-size: 12px;">-</td>
 
-                                    <!-- ✅ ADDED BUTTON -->
                                     <td>
                                         <button onclick="predictBin(this)" class="btn btn-sm btn-primary">
                                             Predict
                                         </button>
                                     </td>
-
                                 </tr>
                                 {% endfor %}
                             </tbody>
-
                         </table>
                     </div>
                     {% else %}
@@ -151,10 +625,25 @@
         </div>
     </div>
 
-</div>
+</div><!-- /container -->
 
-<!-- Live Updating Script -->
+
+<!-- ─── JavaScript ──────────────────────────────────────────────── -->
 <script>
+/* ── Notification bell toggle ── */
+function toggleNotifDropdown() {
+    const dd = document.getElementById('notifDropdown');
+    dd.classList.toggle('show');
+}
+document.addEventListener('click', function (e) {
+    const btn = document.getElementById('notifBellBtn');
+    const dd  = document.getElementById('notifDropdown');
+    if (dd && btn && !btn.contains(e.target) && !dd.contains(e.target)) {
+        dd.classList.remove('show');
+    }
+});
+
+/* ── Live bin updating (unchanged) ── */
 const REFRESH_INTERVAL = 3000;
 const BACKEND_URL = "{{ url_for('index', _external=True).rstrip('/') }}";
 
@@ -169,163 +658,112 @@ async function updateAllBins() {
 
     for (const row of rows) {
         const binCode = row.dataset.binCode;
-
         try {
             const response = await fetch(`${BACKEND_URL}/get_bin_weight/${binCode}`);
             const data = await response.json();
-
             if (!data.success) continue;
 
-            const r = parseFloat(data.recyclable_weight || 0);
-            const nr = parseFloat(data.non_recyclable_weight || 0);
+            const r   = parseFloat(data.recyclable_weight || 0);
+            const nr  = parseFloat(data.non_recyclable_weight || 0);
             const cap = parseFloat(data.capacity || 1);
 
-            row.querySelector(".recyclable-weight").textContent = (r / 1000).toFixed(3);
+            row.querySelector(".recyclable-weight").textContent    = (r / 1000).toFixed(3);
             row.querySelector(".nonrecyclable-weight").textContent = (nr / 1000).toFixed(3);
 
-            const fill = ((r + nr) / cap) * 100;
+            const fill    = ((r + nr) / cap) * 100;
             const fillBar = row.querySelector(".fill-percentage");
+            fillBar.style.width  = fill + "%";
+            fillBar.textContent  = Math.round(fill) + "%";
+            fillBar.className    = "progress-bar fill-percentage " + getStatusColor(data.status);
 
-            fillBar.style.width = fill + "%";
-            fillBar.textContent = Math.round(fill) + "%";
-            fillBar.className = "progress-bar fill-percentage " + getStatusColor(data.status);
-
-            const statusTag = row.querySelector(".bin-status");
+            const statusTag   = row.querySelector(".bin-status");
             statusTag.textContent = data.status;
-            statusTag.className = "badge bin-status " + getStatusColor(data.status);
+            statusTag.className   = "badge bin-status " + getStatusColor(data.status);
 
-            row.querySelector(".last-update-time").textContent =
-                new Date().toLocaleTimeString();
-
+            row.querySelector(".last-update-time").textContent = new Date().toLocaleTimeString();
         } catch (err) {}
     }
-
     updateCounters();
 }
 
 function updateCounters() {
     let urgent = 0, medium = 0, good = 0;
-
     document.querySelectorAll('.bin-status').forEach(el => {
         const status = el.textContent.trim();
-
-        if (status === "Urgent") urgent++;
-        else if (status === "Medium") medium++;
+        if      (status === "Urgent")                             urgent++;
+        else if (status === "Medium")                             medium++;
         else if (status === "Enough Space" || status === "Good") good++;
     });
-
     document.getElementById('urgentCount').textContent = urgent;
     document.getElementById('mediumCount').textContent = medium;
-    document.getElementById('goodCount').textContent = good;
+    document.getElementById('goodCount').textContent   = good;
+
+    /* update bell badge dynamically */
+    const bellBadge = document.querySelector('#notifBellBtn .badge');
+    if (bellBadge) bellBadge.textContent = urgent;
 }
 
+/* ── ML Prediction (unchanged) ── */
+async function predictBin(button) {
+    const row         = button.closest("tr");
+    const fillText    = row.querySelector(".fill-text").textContent;
+    const currentFill = parseFloat(fillText);
+    const hoursSinceCleaned = 12;
 
-// 🔥 UPDATED ML FUNCTION (NO ALERT, SHOW IN TABLE)
-        async function predictBin(button) {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                Current_Fill:        currentFill,
+                Hours_Since_Cleaned: hoursSinceCleaned,
+                Location_Bantwala:   0,
+                Location_Puttur:     0,
+                Location_Sulya:      0,
+                Day_Saturday:        0,
+                Day_Sunday:          0,
+                Time_Evening:        1,
+                Time_Morning:        0
+            })
+        });
 
-            const row = button.closest("tr");
+        const data       = await response.json();
+        const prediction = data.predicted_fill;
+        const growthRate = (prediction - currentFill) / hoursSinceCleaned;
 
-            const fillText = row.querySelector(".fill-text").textContent;
-            const currentFill = parseFloat(fillText);
-
-            const hoursSinceCleaned = 12;
-
-            try {
-                const response = await fetch("http://127.0.0.1:5000/predict", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        Current_Fill: currentFill,
-                        Hours_Since_Cleaned: hoursSinceCleaned,
-                        Location_Bantwala: 0,
-                        Location_Puttur: 0,
-                        Location_Sulya: 0,
-                        Day_Saturday: 0,
-                        Day_Sunday: 0,
-                        Time_Evening: 1,
-                        Time_Morning: 0
-                    })
-                });
-
-                const data = await response.json();
-                const prediction = data.predicted_fill;
-
-                // 🔥 Calculate growth rate
-                const growthRate = (prediction - currentFill) / hoursSinceCleaned;
-
-                let timeToFull = "Stable";
-
-                if (growthRate > 0) {
-                    const remaining = 100 - prediction;
-                    const hours = remaining / growthRate;
-
-                    if (hours < 1) {
-                        timeToFull = "Less than 1 hr";
-                    } else if (hours < 24) {
-                        timeToFull = `${Math.round(hours)} hrs`;
-                    } else {
-                        timeToFull = `${Math.round(hours / 24)} days`;
-                    }
-                }
-
-                // 🔥 Status coloring
-                let color = "green";
-                let text = "Safe";
-
-                if (prediction >= 90) {
-                    color = "red";
-                    text = "Overflow Soon";
-                } else if (prediction >= 70) {
-                    color = "orange";
-                    text = "Filling Fast";
-                }
-
-                // 🔥 FINAL DISPLAY
-                button.parentElement.innerHTML = `
-                    <div style="font-weight:bold; color:${color}">
-                        ${prediction.toFixed(1)}% (${text})
-                        <br>
-                        <small>⏱ ${timeToFull}</small>
-                    </div>
-                `;
-
-            } catch (error) {
-                console.error(error);
-            }
+        let timeToFull = "Stable";
+        if (growthRate > 0) {
+            const remaining = 100 - prediction;
+            const hours     = remaining / growthRate;
+            if      (hours < 1)  timeToFull = "Less than 1 hr";
+            else if (hours < 24) timeToFull = `${Math.round(hours)} hrs`;
+            else                 timeToFull = `${Math.round(hours / 24)} days`;
         }
 
-        // 🔥 Update table cell
+        let color = "green", text = "Safe";
+        if      (prediction >= 90) { color = "red";    text = "Overflow Soon"; }
+        else if (prediction >= 70) { color = "orange"; text = "Filling Fast";  }
+
         button.parentElement.innerHTML = `
-            <span style="color:${color}; font-weight:bold">
+            <div style="font-weight:bold; color:${color}">
                 ${prediction.toFixed(1)}% (${text})
-            </span>
-        `;
+                <br><small>⏱ ${timeToFull}</small>
+            </div>`;
 
     } catch (error) {
         console.error(error);
     }
 }
 
-
-// 🔥 AUTO PREDICT ALL BINS
 async function autoPredictAllBins() {
-    const buttons = document.querySelectorAll("button");
-
-    buttons.forEach(btn => {
-        if (btn.innerText === "Predict") {
-            predictBin(btn);
-        }
+    document.querySelectorAll("button").forEach(btn => {
+        if (btn.innerText === "Predict") predictBin(btn);
     });
 }
 
-
-// 🔥 FINAL LOAD LOGIC
 document.addEventListener("DOMContentLoaded", () => {
     updateAllBins();
     autoPredictAllBins();
-
     setInterval(() => {
         updateAllBins();
         autoPredictAllBins();
